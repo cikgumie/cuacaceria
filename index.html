@@ -218,7 +218,7 @@
                 <!-- KAD IPU -->
                 <div onclick="tukarHero('aqi')" class="neo-card p-6 bg-white rotate-[1deg] cursor-pointer hover:scale-105 active:scale-95 transition-all">
                     <div class="w-12 h-12 bg-zinc-200 border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black text-black">mask</span>
+                        <span class="material-symbols-outlined font-black text-black">air_purifier_gen</span>
                     </div>
                     <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Indeks Udara</p>
                     <p id="ipu-tahap-small" class="font-black text-2xl mt-1 text-black uppercase italic">--</p>
@@ -456,8 +456,8 @@
             } else if (mode === 'aqi') {
                 title.innerText = "Kualiti Udara (IPU)";
                 val.innerText = CWD.aqi;
-                icon.innerText = "mask";
-                bgIcon.innerText = "mask";
+                icon.innerText = "air_purifier_gen";
+                bgIcon.innerText = "air_purifier_gen";
                 
                 // AQI Logic: 50 (Baik), 100 (Sederhana), 200 (Bahaya)
                 percent = Math.min(100, (CWD.aqi / 200) * 100);
