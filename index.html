@@ -41,27 +41,60 @@
     </script>
 
     <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; min-height: max(884px, 100dvh); overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Outfit', sans-serif; min-height: 100dvh; overflow-x: hidden; background: #0f172a; color: white; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Mesh Gradient Background */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 0% 100%, hsla(339,49%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 100%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, hsla(253,16%,7%,1) 0, transparent 50%);
+        }
+
+        /* Floating Blobs */
+        .blob {
+            position: fixed; width: 300px; height: 300px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 50%; filter: blur(80px); opacity: 0.3; z-index: -1; animation: float 20s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(10vw, 20vh) rotate(120deg) scale(1.1); }
+            66% { transform: translate(-10vw, 10vh) rotate(240deg) scale(0.9); }
+            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+        }
+
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content.active { display: block; animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2rem; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .glass-card { transition: all 0.3s ease; }
+        .glass-card:active { transform: scale(0.95); }
+        
         #loader { display: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Night Theme */
-        body.is-night { background-color: #0d1b1b !important; color: #e0e0e0 !important; }
-        .is-night .bg-white\/70, .is-night .bg-white\/60, .is-night .bg-white\/30 { background-color: rgba(30, 41, 41, 0.7) !important; border-color: rgba(255, 255, 255, 0.1) !important; }
-        .is-night .text-slate-800, .is-night .text-sky-700, .is-night .text-slate-500 { color: #cfd8dc !important; }
-        .is-night .bg-\[\#e1f5f4\], .is-night .bg-\[\#e8faf9\] { background-color: #1a2a2a !important; }
-        
-        .safety-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.3); overflow: hidden; margin-top: 12px; }
-        .safety-progress { height: 100%; transition: width 0.5s ease, background-color 0.5s ease; }
+
+        /* Custom Colors for Teen Vibe */
+        .text-neon-blue { color: #00d2ff; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
+        .text-neon-pink { color: #ff007f; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
+        .bg-gradient-hero { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
     </style>
 </head>
-<body class="bg-[#e8faf9] text-[#223131] min-h-screen pb-32 overflow-x-hidden font-body">
+<body class="min-h-screen pb-32 overflow-x-hidden font-body">
+
+    <div class="bg-mesh"></div>
+    <div class="blob" style="top: 10%; left: 10%;"></div>
+    <div class="blob" style="bottom: 20%; right: 10%; background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); animation-delay: -5s;"></div>
+
 
     <div id="loader" class="fixed inset-0 bg-white/50 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
         <div class="w-10 h-10 border-4 border-[#705900] border-t-transparent rounded-full animate-spin mb-2"></div>
@@ -69,170 +102,132 @@
     </div>
 
     <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-3xl flex flex-col px-6 py-4 transition-all duration-300" id="main-header">
+    <header class="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-xl flex flex-col px-6 py-4 border-b border-white/10" id="main-header">
         <div class="flex justify-between items-center w-full">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fdd34d]">
-                    <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=ffafbd" class="w-full h-full object-cover">
+                <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/20 shadow-lg rotate-3 hover:rotate-0 transition-transform">
+                    <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=6366f1&color=fff" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-sky-700 font-headline font-bold tracking-tight text-xl leading-tight">Cuaca Ceria</h1>
-                    <p id="ui-date" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Memuatkan tarikh...</p>
+                    <h1 class="text-white font-headline font-extrabold tracking-tight text-2xl">Cuaca Ceria</h1>
+                    <p id="ui-date" class="text-[10px] font-bold text-white/50 uppercase tracking-widest">Memuatkan tarikh...</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span id="ui-name" class="text-xs font-bold text-sky-700 hidden md:block">Pelajar</span>
-                <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full text-sky-700 hover:bg-sky-100/50 transition-all active:scale-90">
+                <button onclick="toggleSearch()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 text-white hover:bg-white/20 transition-all active:scale-90 border border-white/10">
                     <span class="material-symbols-outlined">search</span>
                 </button>
             </div>
         </div>
         
-        <!-- Search Bar (Hidden by default) -->
         <div id="search-bar" class="hidden mt-4 w-full animate-fadeIn">
             <div class="relative flex items-center">
-                <input type="text" id="input-carian" placeholder="Cari bandar (cth: Kota Bharu)..." 
-                       class="w-full bg-white/80 border border-sky-100 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-sky-500 outline-none shadow-sm pr-12">
-                <button onclick="cariBandar()" class="absolute right-2 bg-sky-600 text-white p-2 rounded-xl hover:bg-sky-700 transition-colors">
+                <input type="text" id="input-carian" placeholder="Cari bandar..." 
+                       class="w-full bg-white/10 border border-white/20 rounded-2xl px-5 py-3 text-sm text-white focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm pr-12 placeholder-white/30">
+                <button onclick="cariBandar()" class="absolute right-2 bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700 transition-colors">
                     <span class="material-symbols-outlined text-sm">search</span>
                 </button>
             </div>
-            <p id="search-status" class="text-[10px] text-sky-600 mt-2 font-bold px-1"></p>
+            <p id="search-status" class="text-[10px] text-indigo-300 mt-2 font-bold px-1"></p>
         </div>
     </header>
 
-    <main class="pt-28 px-6 space-y-8 max-w-2xl mx-auto">
-
+    <main class="pt-32 px-6 space-y-8 max-w-2xl mx-auto">
 
         <section id="view-dashboard" class="tab-content active space-y-6">
-            <div id="gps-alert" class="bg-orange-50 border border-orange-200 p-4 rounded-xl hidden items-center gap-3 text-orange-600">
-                <span class="material-symbols-outlined text-orange-400">warning</span>
-                <p class="text-xs font-semibold">Sila muat naik lokasi GPS di tab Tetapan untuk memantau cuaca.</p>
-            </div>
-
-            <div id="safety-alert" class="bg-rose-50 border border-rose-200 p-5 rounded-xl hidden items-center gap-4 text-rose-700 animate-pulse">
-                <div class="bg-rose-500 p-2 rounded-lg text-white">
+            <div id="safety-alert" class="glass bg-rose-500/20 border-rose-500/30 p-5 hidden items-center gap-4 text-rose-200 animate-pulse">
+                <div class="bg-rose-500 p-2 rounded-xl text-white">
                     <span class="material-symbols-outlined">shield_alert</span>
                 </div>
                 <div>
-                    <h5 class="text-xs font-bold uppercase tracking-tight">STATUS: Aktiviti Luar Diberhentikan</h5>
-                    <p class="text-[10px] font-medium opacity-80 leading-tight">Suhu semasa melebihi 35°C. Sila kekal di dalam bangunan mengikut garis panduan KPM.</p>
+                    <h5 class="text-xs font-bold uppercase">BAHAYA: Gelombang Haba</h5>
+                    <p class="text-[10px] opacity-80 leading-tight">Sila kekal di dalam bangunan mengikut garis panduan KPM.</p>
                 </div>
             </div>
 
-            <section id="hero-card" class="relative bg-gradient-to-br from-[#fdd34d] to-[#97daff] rounded-3xl p-8 overflow-hidden shadow-sm transition-all duration-700">
+            <section id="hero-card" class="relative bg-gradient-hero rounded-[2.5rem] p-8 overflow-hidden shadow-2xl transition-all duration-700 hover:scale-[1.02]">
                 <div class="relative z-10 space-y-1">
-                    <h2 id="cw-condition" class="font-headline font-extrabold text-[#5c4900] text-4xl leading-tight">Menunggu Data...</h2>
-                    <p class="text-[#5c4900] opacity-80 font-medium text-sm">Lokasi Semasa Anda</p>
-                    
-                    <div class="mt-4 max-w-[200px]">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-bold text-[#5c4900] uppercase tracking-tighter">Status Keselamatan KPM</span>
-                            <span id="safety-level-text" class="text-[10px] font-bold text-[#5c4900]">Normal</span>
-                        </div>
-                        <div class="safety-bar">
-                            <div id="safety-progress" class="safety-progress bg-green-500" style="width: 30%"></div>
-                        </div>
+                    <h2 id="cw-condition" class="font-headline font-extrabold text-white text-4xl leading-tight">Menunggu Data...</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-white/70">location_on</span>
+                        <p class="text-white/70 font-medium text-sm">Lokasi Anda</p>
                     </div>
                 </div>
-                <div class="flex items-end justify-between mt-6 relative z-10">
+                <div class="flex items-end justify-between mt-8 relative z-10">
                     <div class="flex flex-col">
-                        <span class="font-headline font-black text-7xl md:text-8xl tracking-tighter text-[#5c4900] flex items-start">
-                           <span id="cw-temp">--</span><span class="text-3xl mt-2">°C</span>
+                        <span class="font-headline font-black text-8xl tracking-tighter text-white flex items-start">
+                           <span id="cw-temp">--</span><span class="text-3xl mt-4 ml-1">°C</span>
                         </span>
-                        <span id="cw-safety-badge" class="bg-white/40 backdrop-blur-md px-4 py-1 rounded-full text-[#5c4900] font-bold text-xs w-fit mt-2">
-                            Memuatkan info...
+                        <span id="cw-safety-badge" class="bg-white/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-white font-bold text-[10px] w-fit mt-4 border border-white/20 uppercase tracking-wider">
+                            Checking safety...
                         </span>
                     </div>
-                    <div class="absolute -right-6 -bottom-4 opacity-90">
-                        <span id="cw-icon" class="material-symbols-outlined text-[140px] text-white drop-shadow-2xl animate-pulse" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
+                    <div class="absolute -right-8 -bottom-6 opacity-80">
+                        <span id="cw-icon" class="material-symbols-outlined text-[160px] text-white drop-shadow-[0_10px_30px_rgba(255,255,255,0.3)] animate-pulse" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
                     </div>
-                </div>
-                <div class="absolute -top-10 -right-10 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
-            </section>
-
-            <section>
-                <h3 class="font-headline font-bold text-lg mb-4 px-1 text-slate-800">Hari Ini</h3>
-                <div id="dashboard-hourly" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-                    <div class="min-w-[100px] flex-shrink-0 bg-white/70 p-5 rounded-3xl flex flex-col items-center justify-center gap-3 shadow-sm border border-white animate-pulse h-28"></div>
                 </div>
             </section>
 
             <section class="grid grid-cols-2 gap-4">
-                <div class="bg-[#e1f5f4] p-6 rounded-3xl relative overflow-hidden group">
-                    <div class="relative z-10">
-                        <div class="w-10 h-10 bg-[#97daff] rounded-full flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-[#006384]">air</span>
-                        </div>
-                        <p class="text-[#4e5f5e] text-[10px] font-bold uppercase tracking-wider">Kelajuan Angin</p>
-                        <p id="cw-wind" class="font-headline font-extrabold text-2xl mt-1 text-slate-800">-- km/j</p>
+                <div class="glass p-6 glass-card group">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-colors">
+                        <span class="material-symbols-outlined text-blue-400">air</span>
                     </div>
+                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Angin</p>
+                    <p id="cw-wind" class="font-headline font-extrabold text-2xl mt-1 text-white">-- km/j</p>
                 </div>
-                <div class="bg-[#e1f5f4] p-6 rounded-3xl relative overflow-hidden group">
-                    <div class="relative z-10">
-                        <div class="w-10 h-10 bg-[#ff8eaf]/30 rounded-full flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-[#a7295a]">humidity_mid</span>
-                        </div>
-                        <p class="text-[#4e5f5e] text-[10px] font-bold uppercase tracking-wider">Kelembapan</p>
-                        <p id="cw-humidity" class="font-headline font-extrabold text-2xl mt-1 text-slate-800">-- %</p>
+                <div class="glass p-6 glass-card group">
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-pink-500/30 transition-colors">
+                        <span class="material-symbols-outlined text-pink-400">water_drop</span>
                     </div>
+                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Lembap</p>
+                    <p id="cw-humidity" class="font-headline font-extrabold text-2xl mt-1 text-white">-- %</p>
                 </div>
             </section>
 
             <section id="ai-tip-container">
-               <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-3xl relative overflow-hidden group">
+               <div class="glass bg-indigo-500/10 p-6 relative overflow-hidden group border-indigo-500/20">
+                  <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
                   <div class="relative z-10">
                      <div class="flex items-center gap-3 mb-3">
-                        <div class="bg-indigo-600 text-white p-2 rounded-xl scale-75 origin-left">
-                           <span class="material-symbols-outlined">smart_toy</span>
+                        <div class="bg-indigo-500 text-white p-2 rounded-xl scale-90">
+                           <span class="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h4 class="font-headline font-bold text-indigo-900 text-sm tracking-tight">Tip Pintar AI (Gemma)</h4>
+                        <h4 class="font-headline font-bold text-indigo-200 text-sm tracking-tight">AI Smart Tip</h4>
                      </div>
-                     <p id="ai-tip-text" class="text-[11px] font-medium text-indigo-800 leading-relaxed italic">"Sedang memikirkan tip terbaik untuk anda..."</p>
+                     <p id="ai-tip-text" class="text-[12px] font-medium text-indigo-100 leading-relaxed italic opacity-90">"Sedang memikirkan tip terbaik untuk anda..."</p>
                   </div>
                </div>
             </section>
 
-            <section class="bg-white/30 rounded-3xl p-6">
-                <h3 class="font-headline font-bold text-lg text-slate-800 mb-6">Ramalan 4 Hari</h3>
+            <section class="glass p-6">
+                <h3 class="font-headline font-bold text-lg text-white mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-amber-400">calendar_month</span>
+                    Ramalan 4 Hari
+                </h3>
                 <div id="forecast-container" class="space-y-4">
-                    <div class="h-20 bg-white/50 rounded-2xl animate-pulse"></div>
+                    <div class="h-20 bg-white/5 rounded-2xl animate-pulse"></div>
                 </div>
             </section>
         </section>
 
         <section id="view-hourly" class="tab-content space-y-6">
-            <h2 class="text-xl font-bold text-slate-800">Ramalan Setiap Jam</h2>
+            <h2 class="text-2xl font-extrabold text-white">Ramalan Per Jam</h2>
             <div id="hourly-container" class="space-y-4">
-                <div class="bg-white/50 p-6 rounded-3xl animate-pulse h-32 w-full"></div>
+                <div class="glass p-6 animate-pulse h-32 w-full"></div>
             </div>
         </section>
 
         <section id="view-tetapan" class="tab-content">
-            <div class="bg-white/60 p-8 rounded-[3rem] max-w-2xl border border-white shadow-sm">
-                <h2 class="text-xl font-bold text-slate-800 mb-6 border-b border-white/50 pb-4">Profil & Lokasi Pelajar</h2>
-                
-                <!-- URL Backend Info -->
-                <div id="url-warning" class="bg-rose-50 border border-rose-200 p-4 rounded-2xl mb-6 text-rose-700 text-xs font-medium">
-                    <p>Sila masukkan <strong>URL Web App</strong> anda dalam kod <code>index.html</code> (pembolehubah <code>BACKEND_URL</code>) untuk membolehkan penyimpanan data.</p>
-                </div>
-
+            <div class="glass p-8 max-w-2xl border-white/10">
+                <h2 class="text-2xl font-extrabold text-white mb-6 border-b border-white/10 pb-4">Profil Kita</h2>
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Penuh</label>
-                        <input type="text" id="input-nama" class="w-full bg-white/50 border border-white rounded-2xl px-4 py-3.5 text-sm outline-none transition-all shadow-sm">
+                        <label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Nama Anda</label>
+                        <input type="text" id="input-nama" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Lokasi Semasa (GPS)</label>
-                        <div class="flex items-center gap-3">
-                            <input type="text" id="input-gps" readonly placeholder="Klik butang untuk lokasi" class="w-full bg-slate-100/50 border border-white rounded-2xl px-4 py-3.5 text-sm outline-none shadow-inner text-slate-500 font-mono">
-                            <button onclick="dapatkanGPS()" class="bg-[#705900] hover:bg-[#5c4900] text-white p-3.5 rounded-2xl shadow-md transition-all active:scale-95">
-                                <span class="material-symbols-outlined">map_pin</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button onclick="simpanDataPenuh()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-3xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 mt-4 uppercase text-xs tracking-widest">
-                        <span class="material-symbols-outlined">save</span> Simpan Tetapan
+                    <button onclick="simpanDataPenuh()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-5 rounded-[2rem] shadow-[0_10px_30px_rgba(79,70,229,0.4)] transition-all active:scale-95 flex justify-center items-center gap-2 mt-4 uppercase text-xs tracking-widest">
+                        <span class="material-symbols-outlined">save</span> Simpan Profile
                     </button>
                 </div>
             </div>
@@ -240,18 +235,18 @@
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-8 pb-4 bg-white/80 backdrop-blur-2xl rounded-t-[3rem] h-24 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
-        <button id="btn-dashboard" onclick="switchTab('dashboard')" class="flex flex-col items-center justify-center bg-[#fdd34d] text-[#5c4900] rounded-full px-6 py-2 transition-all active:scale-95">
+    <nav class="fixed bottom-6 left-6 right-6 flex justify-around items-center glass h-20 z-50 px-2 shadow-2xl">
+        <button id="btn-dashboard" onclick="switchTab('dashboard')" class="flex flex-col items-center justify-center bg-indigo-600 text-white rounded-2xl px-6 py-2 transition-all active:scale-95 shadow-lg shadow-indigo-500/40">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
-            <span class="font-headline font-bold text-[10px] uppercase tracking-tighter mt-1">Dashboard</span>
+            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Home</span>
         </button>
-        <button id="btn-hourly" onclick="switchTab('hourly')" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95">
+        <button id="btn-hourly" onclick="switchTab('hourly')" class="flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3">
             <span class="material-symbols-outlined">schedule</span>
-            <span class="font-headline font-semibold text-[10px] uppercase tracking-tighter mt-1">Hourly</span>
+            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Hourly</span>
         </button>
-        <button id="btn-tetapan" onclick="switchTab('tetapan')" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95">
+        <button id="btn-tetapan" onclick="switchTab('tetapan')" class="flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3">
             <span class="material-symbols-outlined">person</span>
-            <span class="font-headline font-semibold text-[10px] uppercase tracking-tighter mt-1">Profil</span>
+            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Me</span>
         </button>
     </nav>
 
@@ -261,7 +256,6 @@
         const BACKEND_URL = 'https://script.google.com/macros/s/1Jg1onQoPrrm4Z4Q9LE7H6G5yOLGIt6Uu7AP6YEeUwf-55UWXKMrN6yLC/exec';
         
         const GD = { id: 'PELAJAR_TAMU', nama: '', gambar: '', lat: null, lng: null };
-
 
         // Helper untuk panggil GAS dari GitHub
         async function panggilBackend(functionName, args = {}) {
@@ -299,11 +293,6 @@
                 kemaskiniUI();
                 panggilAPI_Cuaca();
             }
-            
-            if (!BACKEND_URL.includes('SILA_MASUKKAN')) {
-                const warning = document.getElementById('url-warning');
-                if (warning) warning.style.display = 'none';
-            }
         };
 
         function switchTab(tabId) {
@@ -317,7 +306,7 @@
                 const btn = document.getElementById('btn-' + t);
                 if (btn) {
                     const isAktif = (t === tabId);
-                    btn.setAttribute('class', isAktif ? "flex flex-col items-center justify-center bg-[#fdd34d] text-[#5c4900] rounded-full px-6 py-2 transition-all active:scale-95" : "flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95");
+                    btn.className = isAktif ? "flex flex-col items-center justify-center bg-indigo-600 text-white rounded-2xl px-6 py-2 transition-all active:scale-95 shadow-lg shadow-indigo-500/40" : "flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3";
                     const icon = btn.querySelector('.material-symbols-outlined');
                     if(icon) icon.style.fontVariationSettings = isAktif ? "'FILL' 1" : "'FILL' 0";
                 }
@@ -345,40 +334,31 @@
                     const loc = data.results[0];
                     GD.lat = loc.latitude.toFixed(6);
                     GD.lng = loc.longitude.toFixed(6);
-                    status.innerText = `Lokasi dijumpai: ${loc.name}, ${loc.country}`;
+                    status.innerText = `📍 ${loc.name}, ${loc.country}`;
                     setTimeout(() => { toggleSearch(); status.innerText = ""; }, 1500);
                     kemaskiniUI();
                     panggilAPI_Cuaca();
                 } else {
-                    status.innerText = "Lokasi tidak dijumpai. Cuba ejaan lain.";
+                    status.innerText = "❌ Lokasi tidak dijumpai.";
                 }
             } catch(e) {
-                status.innerText = "Ralat carian.";
+                status.innerText = "⚠️ Ralat carian.";
             }
         }
 
         function kemaskiniUI() {
-
             const skrg = new Date();
             const senaraiHari = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             const senaraiBulan = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
             const dateEl = document.getElementById('ui-date');
             if (dateEl) dateEl.innerText = senaraiHari[skrg.getDay()] + ', ' + skrg.getDate() + ' ' + senaraiBulan[skrg.getMonth()];
             
-            const nameEl = document.getElementById('ui-name');
-            if (nameEl) nameEl.innerText = GD.nama || 'Pelajar';
-            
             const inputNama = document.getElementById('input-nama');
             if (inputNama) inputNama.value = GD.nama || '';
             
-            if (GD.lat && GD.lng) { 
-                const gpsInput = document.getElementById('input-gps');
-                if (gpsInput) gpsInput.value = GD.lat + ', ' + GD.lng; 
-                const gpsAlert = document.getElementById('gps-alert');
-                if (gpsAlert) gpsAlert.style.display = 'none'; 
-            } else { 
-                const gpsAlert = document.getElementById('gps-alert');
-                if (gpsAlert) gpsAlert.style.display = 'flex'; 
+            if (GD.gambar) {
+                const avatar = document.getElementById('ui-avatar');
+                if (avatar) avatar.src = GD.gambar;
             }
         }
 
@@ -404,14 +384,11 @@
                 const humEl = document.getElementById('cw-humidity');
                 if (humEl) humEl.innerText = hr.relative_humidity_2m[nowIdx] + ' %';
                 
-                const isDay = cw.is_day === 1;
-                document.body.classList.toggle('is-night', !isDay);
-                
                 const dapatkanInfo = (kod) => {
                     if (kod === 0) return { teks: "Cerah", icon: "wb_sunny" };
                     if (kod >= 1 && kod <= 3) return { teks: "Mendung", icon: "cloud" };
-                    if (kod >= 51 && kod <= 67) return { teks: "Hujan", icon: "cloudy_snowing" };
-                    return { teks: "Berawan", icon: "cloud_queue" }; // Guna cloud_queue lebih selamat
+                    if (kod >= 51 && kod <= 67) return { teks: "Hujan", icon: "cloud_queue" };
+                    return { teks: "Berawan", icon: "cloud_queue" }; 
                 };
                 
                 const info = dapatkanInfo(cw.weathercode);
@@ -423,21 +400,18 @@
                 
                 // Safety Logic
                 const temp = cw.temperature;
-                const progress = document.getElementById('safety-progress');
-                const levelText = document.getElementById('safety-level-text');
                 const badge = document.getElementById('cw-safety-badge');
+                const alertBox = document.getElementById('safety-alert');
 
-                if (progress && levelText && badge) {
+                if (badge) {
                     if (temp < 35) {
-                        progress.style.width = '30%';
-                        progress.className = 'safety-progress bg-green-500';
-                        levelText.innerText = 'Normal';
                         badge.innerText = 'Sesuai untuk aktiviti luar!';
+                        badge.className = 'bg-green-500/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-green-300 font-bold text-[10px] w-fit mt-4 border border-green-500/20 uppercase tracking-wider';
+                        if (alertBox) alertBox.classList.add('hidden');
                     } else {
-                        progress.style.width = '100%';
-                        progress.className = 'safety-progress bg-red-600';
-                        levelText.innerText = 'Amaran Suhu';
                         badge.innerText = 'Waspada Suhu Tinggi!';
+                        badge.className = 'bg-rose-500/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-rose-300 font-bold text-[10px] w-fit mt-4 border border-rose-500/20 uppercase tracking-wider';
+                        if (alertBox) alertBox.classList.remove('hidden');
                     }
                 }
 
@@ -459,8 +433,8 @@
                     for (let i = 1; i < 5; i++) {
                         const f = dapatkanInfo(data.daily.weather_code[i]);
                         const row = document.createElement('div');
-                        row.className = 'flex items-center justify-between bg-white/10 p-4 rounded-2xl border border-white/5';
-                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-amber-400">${f.icon}</span><p class="font-bold text-sm text-white/80">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-white">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
+                        row.className = 'flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5';
+                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-amber-400">${f.icon}</span><p class="font-bold text-sm text-white/70">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-white">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
                         container.appendChild(row);
                     }
                 }
@@ -473,8 +447,8 @@
                     for (let i = skrgHr; i < skrgHr + 6; i++) {
                         const h = dapatkanInfo(hr.weather_code[i]);
                         const card = document.createElement('div');
-                        card.className = 'min-w-[100px] bg-white/10 p-5 rounded-[2rem] flex flex-col items-center gap-3 border border-white/5';
-                        card.innerHTML = `<span class="text-[9px] font-bold text-white/40">${i % 24}:00</span><span class="material-symbols-outlined text-3xl text-amber-300">${h.icon}</span><span class="font-black text-xl text-white">${Math.round(hr.temperature_2m[i])}°</span>`;
+                        card.className = 'min-w-[100px] bg-white/5 p-5 rounded-[2rem] flex flex-col items-center gap-3 border border-white/5';
+                        card.innerHTML = `<span class="text-[9px] font-bold text-white/30">${i % 24}:00</span><span class="material-symbols-outlined text-3xl text-amber-300">${h.icon}</span><span class="font-black text-xl text-white">${Math.round(hr.temperature_2m[i])}°</span>`;
                         dash.appendChild(card);
                     }
                 }
@@ -482,14 +456,11 @@
             } catch (err) { console.error(err); }
         }
 
-
         function dapatkanGPS() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(p => {
                     GD.lat = p.coords.latitude.toFixed(6); 
                     GD.lng = p.coords.longitude.toFixed(6);
-                    const gpsInput = document.getElementById('input-gps');
-                    if(gpsInput) gpsInput.value = GD.lat + ', ' + GD.lng;
                     kemaskiniUI();
                     panggilAPI_Cuaca();
                 });
@@ -499,18 +470,12 @@
         async function simpanDataPenuh() {
             const loader = document.getElementById('loader');
             if (loader) loader.style.display = 'flex';
-            
             const inputNama = document.getElementById('input-nama');
             if (inputNama) GD.nama = inputNama.value;
-            
             localStorage.setItem('PelajarData', JSON.stringify(GD));
-            
             const res = await panggilBackend('simpanTetapan', GD);
             if (loader) loader.style.display = 'none';
-            
-            if (res) alert('Tetapan disimpan di Cloud!');
-            else alert('Tetapan disimpan secara lokal sahaja.');
-            
+            if (res) alert('✅ Profile disimpan!');
             kemaskiniUI();
             panggilAPI_Cuaca();
         }
