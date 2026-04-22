@@ -41,59 +41,89 @@
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&display=swap');
         
-        body { font-family: 'Outfit', sans-serif; min-height: 100dvh; overflow-x: hidden; background: #0f172a; color: white; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        
-        /* Mesh Gradient Background */
-        .bg-mesh {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background-color: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 0% 100%, hsla(339,49%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 100%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, hsla(253,16%,7%,1) 0, transparent 50%);
+        :root {
+            --bg-color: #CCFF00;
+            --card-yellow: #FAFF00;
+            --border-width: 4px;
+            --shadow-offset: 8px;
         }
 
-        /* Floating Blobs */
-        .blob {
-            position: fixed; width: 300px; height: 300px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            border-radius: 50%; filter: blur(80px); opacity: 0.3; z-index: -1; animation: float 20s infinite alternate;
+        body { 
+            font-family: 'Public Sans', sans-serif; 
+            background-color: var(--bg-color); 
+            color: black; 
+            min-height: 100dvh; 
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(black 2px, transparent 2px),
+                radial-gradient(black 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            background-attachment: fixed;
         }
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            33% { transform: translate(10vw, 20vh) rotate(120deg) scale(1.1); }
-            66% { transform: translate(-10vw, 10vh) rotate(240deg) scale(0.9); }
-            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+
+        .neo-card {
+            background: white;
+            border: var(--border-width) solid black;
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .neo-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0px 0px #000;
+        }
+
+        .neo-btn {
+            background: var(--card-yellow);
+            border: var(--border-width) solid black;
+            box-shadow: 4px 4px 0px 0px #000;
+            border-radius: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.1s ease;
+        }
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #000;
+        }
+
+        .neo-input {
+            border: var(--border-width) solid black;
+            border-radius: 12px;
+            padding: 12px 16px;
+            outline: none;
+            font-weight: 700;
         }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2rem; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-        .glass-card { transition: all 0.3s ease; }
-        .glass-card:active { transform: scale(0.95); }
-        
-        #loader { display: none; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-content.active { display: block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Custom Colors for Teen Vibe */
-        .text-neon-blue { color: #00d2ff; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
-        .text-neon-pink { color: #ff007f; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
-        .bg-gradient-hero { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .doodle-star {
+            position: fixed; pointer-events: none; z-index: -1;
+            font-size: 40px; color: black;
+        }
+
+        /* Weather specific neo-styles */
+        .hero-yellow { background: var(--card-yellow); }
+        .text-outline { -webkit-text-stroke: 1px black; }
+        
+        .safety-bar { height: 12px; border: 3px solid black; background: white; border-radius: 10px; overflow: hidden; }
+        .safety-progress { height: 100%; transition: width 0.5s ease; }
     </style>
 </head>
-<body class="min-h-screen pb-32 overflow-x-hidden font-body">
+<body class="pb-32 font-body">
 
-    <div class="bg-mesh"></div>
-    <div class="blob" style="top: 10%; left: 10%;"></div>
-    <div class="blob" style="bottom: 20%; right: 10%; background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); animation-delay: -5s;"></div>
+    <!-- Doodle elements -->
+    <div class="doodle-star" style="top: 10%; left: 5%;">★</div>
+    <div class="doodle-star" style="top: 30%; right: 5%;">✧</div>
+    <div class="doodle-star" style="bottom: 15%; left: 10%;">☀</div>
+    <div class="doodle-star" style="bottom: 40%; right: 10%;">☁</div>
+
 
 
     <div id="loader" class="fixed inset-0 bg-white/50 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
@@ -102,132 +132,129 @@
     </div>
 
     <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-xl flex flex-col px-6 py-4 border-b border-white/10" id="main-header">
+    <header class="fixed top-0 w-full z-50 bg-white border-b-4 border-black px-6 py-4 flex flex-col transition-all duration-300" id="main-header">
         <div class="flex justify-between items-center w-full">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/20 shadow-lg rotate-3 hover:rotate-0 transition-transform">
-                    <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=6366f1&color=fff" class="w-full h-full object-cover">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white border-4 border-black shadow-[4px_4px_0_0_#000] rotate-3 overflow-hidden">
+                    <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=FAFF00&color=000&bold=true" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-white font-headline font-extrabold tracking-tight text-2xl">Cuaca Ceria</h1>
-                    <p id="ui-date" class="text-[10px] font-bold text-white/50 uppercase tracking-widest">Memuatkan tarikh...</p>
+                    <h1 class="text-black font-black tracking-tighter text-3xl uppercase italic">Cuaca Ceria</h1>
+                    <p id="ui-date" class="text-[10px] font-black text-black/60 uppercase tracking-widest">Memuatkan tarikh...</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleSearch()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 text-white hover:bg-white/20 transition-all active:scale-90 border border-white/10">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-            </div>
+            <button onclick="toggleSearch()" class="neo-btn w-12 h-12 flex items-center justify-center">
+                <span class="material-symbols-outlined font-black">search</span>
+            </button>
         </div>
         
-        <div id="search-bar" class="hidden mt-4 w-full animate-fadeIn">
+        <div id="search-bar" class="hidden mt-4 w-full">
             <div class="relative flex items-center">
                 <input type="text" id="input-carian" placeholder="Cari bandar..." 
-                       class="w-full bg-white/10 border border-white/20 rounded-2xl px-5 py-3 text-sm text-white focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm pr-12 placeholder-white/30">
-                <button onclick="cariBandar()" class="absolute right-2 bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700 transition-colors">
+                       class="neo-input w-full bg-white placeholder-black/30">
+                <button onclick="cariBandar()" class="absolute right-2 neo-btn p-2 bg-black text-white">
                     <span class="material-symbols-outlined text-sm">search</span>
                 </button>
             </div>
-            <p id="search-status" class="text-[10px] text-indigo-300 mt-2 font-bold px-1"></p>
+            <p id="search-status" class="text-[10px] text-black mt-2 font-black px-1 uppercase"></p>
         </div>
     </header>
 
-    <main class="pt-32 px-6 space-y-8 max-w-2xl mx-auto">
+    <main class="pt-36 px-6 space-y-10 max-w-2xl mx-auto">
 
-        <section id="view-dashboard" class="tab-content active space-y-6">
-            <div id="safety-alert" class="glass bg-rose-500/20 border-rose-500/30 p-5 hidden items-center gap-4 text-rose-200 animate-pulse">
-                <div class="bg-rose-500 p-2 rounded-xl text-white">
+        <section id="view-dashboard" class="tab-content active space-y-10">
+            <div id="safety-alert" class="neo-card bg-red-500 p-5 hidden items-center gap-4 text-white">
+                <div class="bg-black p-2 rounded-lg">
                     <span class="material-symbols-outlined">shield_alert</span>
                 </div>
                 <div>
-                    <h5 class="text-xs font-bold uppercase">BAHAYA: Gelombang Haba</h5>
-                    <p class="text-[10px] opacity-80 leading-tight">Sila kekal di dalam bangunan mengikut garis panduan KPM.</p>
+                    <h5 class="text-xs font-black uppercase tracking-widest">BAHAYA: Gelombang Haba</h5>
+                    <p class="text-[10px] font-bold leading-tight uppercase">Kekal di dalam bangunan! - Arahan KPM</p>
                 </div>
             </div>
 
-            <section id="hero-card" class="relative bg-gradient-hero rounded-[2.5rem] p-8 overflow-hidden shadow-2xl transition-all duration-700 hover:scale-[1.02]">
-                <div class="relative z-10 space-y-1">
-                    <h2 id="cw-condition" class="font-headline font-extrabold text-white text-4xl leading-tight">Menunggu Data...</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm text-white/70">location_on</span>
-                        <p class="text-white/70 font-medium text-sm">Lokasi Anda</p>
+            <section id="hero-card" class="neo-card hero-yellow p-8 relative overflow-hidden group">
+                <div class="relative z-10 space-y-2">
+                    <h2 id="cw-condition" class="font-black text-black text-5xl uppercase italic tracking-tighter">-- Ceria</h2>
+                    <div class="flex items-center gap-2 bg-black text-white w-fit px-3 py-1 rounded-md">
+                        <span class="material-symbols-outlined text-xs">location_on</span>
+                        <p class="font-black text-[10px] uppercase tracking-widest">Lokasi Anda</p>
                     </div>
                 </div>
-                <div class="flex items-end justify-between mt-8 relative z-10">
+                <div class="flex items-end justify-between mt-10 relative z-10">
                     <div class="flex flex-col">
-                        <span class="font-headline font-black text-8xl tracking-tighter text-white flex items-start">
-                           <span id="cw-temp">--</span><span class="text-3xl mt-4 ml-1">°C</span>
+                        <span class="font-black text-9xl tracking-tighter text-black flex items-start">
+                           <span id="cw-temp">--</span><span class="text-4xl mt-6">°C</span>
                         </span>
-                        <span id="cw-safety-badge" class="bg-white/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-white font-bold text-[10px] w-fit mt-4 border border-white/20 uppercase tracking-wider">
-                            Checking safety...
+                        <span id="cw-safety-badge" class="neo-btn bg-white px-4 py-2 text-black text-[10px] w-fit mt-6 border-2">
+                            Checking...
                         </span>
                     </div>
-                    <div class="absolute -right-8 -bottom-6 opacity-80">
-                        <span id="cw-icon" class="material-symbols-outlined text-[160px] text-white drop-shadow-[0_10px_30px_rgba(255,255,255,0.3)] animate-pulse" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
+                    <div class="absolute -right-6 -bottom-6 opacity-20">
+                        <span id="cw-icon" class="material-symbols-outlined text-[200px] text-black" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
                     </div>
                 </div>
             </section>
 
-            <section class="grid grid-cols-2 gap-4">
-                <div class="glass p-6 glass-card group">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-colors">
-                        <span class="material-symbols-outlined text-blue-400">air</span>
+            <section class="grid grid-cols-2 gap-6">
+                <div class="neo-card p-6 bg-white rotate-[-1deg]">
+                    <div class="w-12 h-12 bg-[#CCFF00] border-4 border-black flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined font-black">air</span>
                     </div>
-                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Angin</p>
-                    <p id="cw-wind" class="font-headline font-extrabold text-2xl mt-1 text-white">-- km/j</p>
+                    <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Angin</p>
+                    <p id="cw-wind" class="font-black text-3xl mt-1 text-black">-- km/j</p>
                 </div>
-                <div class="glass p-6 glass-card group">
-                    <div class="w-12 h-12 bg-pink-500/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-pink-500/30 transition-colors">
-                        <span class="material-symbols-outlined text-pink-400">water_drop</span>
+                <div class="neo-card p-6 bg-white rotate-[1deg]">
+                    <div class="w-12 h-12 bg-sky-400 border-4 border-black flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined font-black">water_drop</span>
                     </div>
-                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Lembap</p>
-                    <p id="cw-humidity" class="font-headline font-extrabold text-2xl mt-1 text-white">-- %</p>
+                    <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Lembap</p>
+                    <p id="cw-humidity" class="font-black text-3xl mt-1 text-black">-- %</p>
                 </div>
             </section>
 
             <section id="ai-tip-container">
-               <div class="glass bg-indigo-500/10 p-6 relative overflow-hidden group border-indigo-500/20">
-                  <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+               <div class="neo-card bg-white p-6 relative overflow-hidden border-black">
                   <div class="relative z-10">
-                     <div class="flex items-center gap-3 mb-3">
-                        <div class="bg-indigo-500 text-white p-2 rounded-xl scale-90">
-                           <span class="material-symbols-outlined">auto_awesome</span>
+                     <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-black text-white p-2 rounded-md">
+                           <span class="material-symbols-outlined text-sm">auto_awesome</span>
                         </div>
-                        <h4 class="font-headline font-bold text-indigo-200 text-sm tracking-tight">AI Smart Tip</h4>
+                        <h4 class="font-black text-black text-sm uppercase tracking-widest italic underline decoration-4 decoration-[#CCFF00]">AI Smart Tip</h4>
                      </div>
-                     <p id="ai-tip-text" class="text-[12px] font-medium text-indigo-100 leading-relaxed italic opacity-90">"Sedang memikirkan tip terbaik untuk anda..."</p>
+                     <p id="ai-tip-text" class="text-[13px] font-bold text-black leading-relaxed italic bg-[#FAFF00] p-3 border-2 border-black">"Sedang memikirkan tip terbaik untuk anda..."</p>
                   </div>
                </div>
             </section>
 
-            <section class="glass p-6">
-                <h3 class="font-headline font-bold text-lg text-white mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-amber-400">calendar_month</span>
+            <section class="neo-card bg-white p-6">
+                <h3 class="font-black text-xl text-black mb-8 flex items-center gap-3 uppercase italic">
+                    <span class="material-symbols-outlined font-black text-2xl">calendar_month</span>
                     Ramalan 4 Hari
                 </h3>
-                <div id="forecast-container" class="space-y-4">
-                    <div class="h-20 bg-white/5 rounded-2xl animate-pulse"></div>
+                <div id="forecast-container" class="space-y-6">
+                    <div class="h-20 bg-black/10 rounded-lg animate-pulse border-2 border-black border-dashed"></div>
                 </div>
             </section>
         </section>
 
-        <section id="view-hourly" class="tab-content space-y-6">
-            <h2 class="text-2xl font-extrabold text-white">Ramalan Per Jam</h2>
-            <div id="hourly-container" class="space-y-4">
-                <div class="glass p-6 animate-pulse h-32 w-full"></div>
+        <section id="view-hourly" class="tab-content space-y-10">
+            <h2 class="text-4xl font-black text-black uppercase italic tracking-tighter">Per Jam</h2>
+            <div id="dashboard-hourly" class="flex gap-6 overflow-x-auto pb-6 no-scrollbar px-1">
+                <div class="min-w-[120px] neo-card bg-white p-6 flex flex-col items-center gap-4 h-32 animate-pulse border-dashed"></div>
             </div>
         </section>
 
         <section id="view-tetapan" class="tab-content">
-            <div class="glass p-8 max-w-2xl border-white/10">
-                <h2 class="text-2xl font-extrabold text-white mb-6 border-b border-white/10 pb-4">Profil Kita</h2>
-                <div class="space-y-6">
+            <div class="neo-card p-8 bg-white">
+                <h2 class="text-3xl font-black text-black mb-8 border-b-4 border-black pb-4 uppercase italic">Profil Kita</h2>
+                <div class="space-y-8">
                     <div>
-                        <label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Nama Anda</label>
-                        <input type="text" id="input-nama" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner">
+                        <label class="block text-[10px] font-black text-black/50 uppercase tracking-widest mb-3">Nama Anda</label>
+                        <input type="text" id="input-nama" class="neo-input w-full bg-[#FAFF00]/10 placeholder-black/20" placeholder="Type your name...">
                     </div>
-                    <button onclick="simpanDataPenuh()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-5 rounded-[2rem] shadow-[0_10px_30px_rgba(79,70,229,0.4)] transition-all active:scale-95 flex justify-center items-center gap-2 mt-4 uppercase text-xs tracking-widest">
-                        <span class="material-symbols-outlined">save</span> Simpan Profile
+                    <button onclick="simpanDataPenuh()" class="neo-btn w-full py-6 text-xl bg-black text-white hover:bg-zinc-800 flex justify-center items-center gap-3">
+                        <span class="material-symbols-outlined font-black">save</span> Simpan Data
                     </button>
                 </div>
             </div>
@@ -235,20 +262,21 @@
 
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 flex justify-around items-center glass h-20 z-50 px-2 shadow-2xl">
-        <button id="btn-dashboard" onclick="switchTab('dashboard')" class="flex flex-col items-center justify-center bg-indigo-600 text-white rounded-2xl px-6 py-2 transition-all active:scale-95 shadow-lg shadow-indigo-500/40">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
-            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Home</span>
+    <nav class="fixed bottom-6 left-6 right-6 flex justify-around items-center h-24 z-50 px-4">
+        <button id="btn-dashboard" onclick="switchTab('dashboard')" class="neo-btn flex-1 flex flex-col items-center justify-center h-16 max-w-[100px] bg-black text-white mx-1">
+            <span class="material-symbols-outlined font-black">home</span>
+            <span class="font-black text-[9px] uppercase mt-1">Home</span>
         </button>
-        <button id="btn-hourly" onclick="switchTab('hourly')" class="flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3">
-            <span class="material-symbols-outlined">schedule</span>
-            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Hourly</span>
+        <button id="btn-hourly" onclick="switchTab('hourly')" class="neo-btn flex-1 flex flex-col items-center justify-center h-16 max-w-[100px] bg-white text-black mx-1">
+            <span class="material-symbols-outlined font-black">schedule</span>
+            <span class="font-black text-[9px] uppercase mt-1">Time</span>
         </button>
-        <button id="btn-tetapan" onclick="switchTab('tetapan')" class="flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3">
-            <span class="material-symbols-outlined">person</span>
-            <span class="font-headline font-bold text-[10px] uppercase tracking-widest mt-1">Me</span>
+        <button id="btn-tetapan" onclick="switchTab('tetapan')" class="neo-btn flex-1 flex flex-col items-center justify-center h-16 max-w-[100px] bg-white text-black mx-1">
+            <span class="material-symbols-outlined font-black">person</span>
+            <span class="font-black text-[9px] uppercase mt-1">Me</span>
         </button>
     </nav>
+
 
     <script>
         // --- KONFIGURASI BACKEND ---
@@ -306,9 +334,7 @@
                 const btn = document.getElementById('btn-' + t);
                 if (btn) {
                     const isAktif = (t === tabId);
-                    btn.className = isAktif ? "flex flex-col items-center justify-center bg-indigo-600 text-white rounded-2xl px-6 py-2 transition-all active:scale-95 shadow-lg shadow-indigo-500/40" : "flex flex-col items-center justify-center text-white/40 hover:text-white transition-all active:scale-95 p-3";
-                    const icon = btn.querySelector('.material-symbols-outlined');
-                    if(icon) icon.style.fontVariationSettings = isAktif ? "'FILL' 1" : "'FILL' 0";
+                    btn.className = isAktif ? "neo-btn flex-1 flex flex-col items-center justify-center h-16 max-w-[100px] bg-black text-white mx-1" : "neo-btn flex-1 flex flex-col items-center justify-center h-16 max-w-[100px] bg-white text-black mx-1";
                 }
             });
             if(tabId !== 'tetapan') panggilAPI_Cuaca();
@@ -355,11 +381,6 @@
             
             const inputNama = document.getElementById('input-nama');
             if (inputNama) inputNama.value = GD.nama || '';
-            
-            if (GD.gambar) {
-                const avatar = document.getElementById('ui-avatar');
-                if (avatar) avatar.src = GD.gambar;
-            }
         }
 
         async function panggilAPI_Cuaca() {
@@ -406,11 +427,11 @@
                 if (badge) {
                     if (temp < 35) {
                         badge.innerText = 'Sesuai untuk aktiviti luar!';
-                        badge.className = 'bg-green-500/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-green-300 font-bold text-[10px] w-fit mt-4 border border-green-500/20 uppercase tracking-wider';
+                        badge.className = 'neo-btn bg-white px-4 py-2 text-black text-[10px] w-fit mt-6 border-2';
                         if (alertBox) alertBox.classList.add('hidden');
                     } else {
                         badge.innerText = 'Waspada Suhu Tinggi!';
-                        badge.className = 'bg-rose-500/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-rose-300 font-bold text-[10px] w-fit mt-4 border border-rose-500/20 uppercase tracking-wider';
+                        badge.className = 'neo-btn bg-red-500 px-4 py-2 text-white text-[10px] w-fit mt-6 border-2';
                         if (alertBox) alertBox.classList.remove('hidden');
                     }
                 }
@@ -433,8 +454,8 @@
                     for (let i = 1; i < 5; i++) {
                         const f = dapatkanInfo(data.daily.weather_code[i]);
                         const row = document.createElement('div');
-                        row.className = 'flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5';
-                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-amber-400">${f.icon}</span><p class="font-bold text-sm text-white/70">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-white">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
+                        row.className = 'flex items-center justify-between bg-white border-2 border-black p-4 shadow-[4px_4px_0_0_#000]';
+                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined font-black text-black">${f.icon}</span><p class="font-black text-xs uppercase tracking-widest">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-black text-xl italic underline decoration-4 decoration-[#CCFF00]">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
                         container.appendChild(row);
                     }
                 }
@@ -447,8 +468,8 @@
                     for (let i = skrgHr; i < skrgHr + 6; i++) {
                         const h = dapatkanInfo(hr.weather_code[i]);
                         const card = document.createElement('div');
-                        card.className = 'min-w-[100px] bg-white/5 p-5 rounded-[2rem] flex flex-col items-center gap-3 border border-white/5';
-                        card.innerHTML = `<span class="text-[9px] font-bold text-white/30">${i % 24}:00</span><span class="material-symbols-outlined text-3xl text-amber-300">${h.icon}</span><span class="font-black text-xl text-white">${Math.round(hr.temperature_2m[i])}°</span>`;
+                        card.className = 'min-w-[120px] neo-card bg-white p-6 flex flex-col items-center gap-4';
+                        card.innerHTML = `<span class="text-[10px] font-black text-black/40 uppercase">${i % 24}:00</span><span class="material-symbols-outlined text-4xl font-black">${h.icon}</span><span class="font-black text-2xl text-black underline decoration-4 decoration-[#FAFF00]">${Math.round(hr.temperature_2m[i])}°</span>`;
                         dash.appendChild(card);
                     }
                 }
