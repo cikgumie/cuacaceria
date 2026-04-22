@@ -163,82 +163,74 @@
     <main class="pt-36 px-6 space-y-10 max-w-2xl mx-auto">
 
         <section id="view-dashboard" class="tab-content active space-y-10">
-            <div id="safety-alert" class="neo-card bg-red-500 p-5 hidden items-center gap-4 text-white">
-                <div class="bg-black p-2 rounded-lg">
-                    <span class="material-symbols-outlined">shield_alert</span>
-                </div>
-                <div>
-                    <h5 class="text-xs font-black uppercase tracking-widest">BAHAYA: Gelombang Haba</h5>
-                    <p class="text-[10px] font-bold leading-tight uppercase">Kekal di dalam bangunan! - Arahan KPM</p>
-                </div>
-            </div>
+            <section id="hero-card" class="neo-card hero-yellow p-8 relative overflow-hidden transition-all duration-500">
+                <div class="relative z-10 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="hero-title" class="font-black text-black text-xs uppercase tracking-[0.2em]">Suhu Semasa</h2>
+                            <h3 id="hero-value-main" class="font-black text-black text-7xl uppercase italic tracking-tighter mt-1">--°</h3>
+                        </div>
+                        <span id="hero-icon" class="material-symbols-outlined text-7xl text-black">thermostat</span>
+                    </div>
 
-            <section id="hero-card" class="neo-card hero-yellow p-8 relative overflow-hidden group">
-                <div class="relative z-10 space-y-2">
-                    <h2 id="cw-condition" class="font-black text-black text-5xl uppercase italic tracking-tighter">-- Ceria</h2>
-                    <div class="flex items-center gap-2 bg-black text-white w-fit px-3 py-1 rounded-md">
-                        <span class="material-symbols-outlined text-xs">location_on</span>
-                        <p class="font-black text-[10px] uppercase tracking-widest">Lokasi Anda</p>
+                    <!-- KPM METER -->
+                    <div class="space-y-2 pt-4">
+                        <div class="flex justify-between text-[9px] font-black uppercase tracking-widest text-black/60">
+                            <span id="meter-label-left">Selamat</span>
+                            <span id="meter-label-mid">Waspada</span>
+                            <span id="meter-label-right">Bahaya</span>
+                        </div>
+                        <div class="safety-bar">
+                            <div id="hero-meter-bar" class="safety-progress bg-green-500" style="width: 0%"></div>
+                        </div>
+                        <div id="hero-msg-box" class="bg-black text-white p-3 border-2 border-black">
+                            <p id="hero-msg" class="text-[10px] font-black uppercase italic leading-tight">
+                                Sistem sedang memuatkan data keselamatan KPM...
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-end justify-between mt-10 relative z-10">
-                    <div class="flex flex-col">
-                        <span class="font-black text-9xl tracking-tighter text-black flex items-start">
-                           <span id="cw-temp">--</span><span class="text-4xl mt-6">°C</span>
-                        </span>
-                        <span id="cw-safety-badge" class="neo-btn bg-white px-4 py-2 text-black text-[10px] w-fit mt-6 border-2">
-                            Checking...
-                        </span>
-                    </div>
-                    <div class="absolute -right-6 -bottom-6 opacity-20">
-                        <span id="cw-icon" class="material-symbols-outlined text-[200px] text-black" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
-                    </div>
+                <!-- Background Decoration -->
+                <div class="absolute -right-10 -bottom-10 opacity-5 rotate-12">
+                   <span id="hero-bg-icon" class="material-symbols-outlined text-[250px]">thermostat</span>
                 </div>
             </section>
 
             <section class="grid grid-cols-2 gap-6">
-                <!-- KAD ANGIN (Asal) -->
-                <div class="neo-card p-6 bg-white rotate-[-1deg]">
+                <!-- KAD ANGIN -->
+                <div onclick="tukarHero('wind')" class="neo-card p-6 bg-white rotate-[-1deg] cursor-pointer hover:scale-105 active:scale-95 transition-all">
                     <div class="w-12 h-12 bg-[#CCFF00] border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">air</span>
+                        <span class="material-symbols-outlined font-black text-black">air</span>
                     </div>
                     <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Angin</p>
                     <p id="cw-wind" class="font-black text-3xl mt-1 text-black">-- km/j</p>
-                    <p class="text-[9px] font-bold mt-2 text-black/60 italic">Panduan: Berhati-hati jika melebihi 40km/j.</p>
                 </div>
 
-                <!-- KAD LEMBAP (Asal) -->
-                <div class="neo-card p-6 bg-white rotate-[1deg]">
+                <!-- KAD LEMBAP -->
+                <div onclick="tukarHero('humidity')" class="neo-card p-6 bg-white rotate-[1deg] cursor-pointer hover:scale-105 active:scale-95 transition-all">
                     <div class="w-12 h-12 bg-sky-400 border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">water_drop</span>
+                        <span class="material-symbols-outlined font-black text-black">water_drop</span>
                     </div>
                     <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Lembap</p>
                     <p id="cw-humidity" class="font-black text-3xl mt-1 text-black">-- %</p>
-                    <p class="text-[9px] font-bold mt-2 text-black/60 italic">Panduan: Sesuai untuk jemur kain jika < 60%.</p>
                 </div>
 
-                <!-- KAD IPU (Baru) -->
-                <div class="neo-card p-6 bg-white rotate-[1deg]">
+                <!-- KAD IPU -->
+                <div onclick="tukarHero('aqi')" class="neo-card p-6 bg-white rotate-[1deg] cursor-pointer hover:scale-105 active:scale-95 transition-all">
                     <div class="w-12 h-12 bg-zinc-200 border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">mask</span>
+                        <span class="material-symbols-outlined font-black text-black">mask</span>
                     </div>
                     <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Indeks Udara</p>
-                    <p id="ipu-tahap" class="font-black text-2xl mt-1 text-black uppercase italic">Memuatkan...</p>
-                    <div class="mt-3 pt-3 border-t-2 border-black border-dashed">
-                        <p id="ipu-peringatan" class="text-[9px] font-black text-red-500 uppercase leading-tight">Peringatan: --</p>
-                    </div>
+                    <p id="ipu-tahap-small" class="font-black text-2xl mt-1 text-black uppercase italic">--</p>
                 </div>
 
-                <!-- KAD PASANG SURUT (Baru) -->
-                <div class="neo-card p-6 bg-white rotate-[-1deg]">
+                <!-- KAD PASANG SURUT -->
+                <div onclick="tukarHero('tide')" class="neo-card p-6 bg-white rotate-[-1deg] cursor-pointer hover:scale-105 active:scale-95 transition-all">
                     <div class="w-12 h-12 bg-amber-300 border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">tsunami</span>
+                        <span class="material-symbols-outlined font-black text-black">tsunami</span>
                     </div>
                     <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Pantai</p>
                     <p class="font-black text-2xl mt-1 text-black uppercase italic">Waspada</p>
-                    <div class="mt-3 pt-3 border-t-2 border-black border-dashed">
-                        <p class="text-[9px] font-black text-black leading-tight uppercase italic">Peringatan: Periksa jadual air pasang JUPEM.</p>
-                    </div>
                 </div>
             </section>
 
@@ -417,6 +409,94 @@
             if (inputNama) inputNama.value = GD.nama || '';
         }
 
+        const CWD = { temp: 0, wind: 0, hum: 0, aqi: 0, aqiText: '--', status: '--', icon: 'thermostat' };
+
+        function tukarHero(mode) {
+            const title = document.getElementById('hero-title');
+            const val = document.getElementById('hero-value-main');
+            const icon = document.getElementById('hero-icon');
+            const bgIcon = document.getElementById('hero-bg-icon');
+            const bar = document.getElementById('hero-meter-bar');
+            const msg = document.getElementById('hero-msg');
+            const lblL = document.getElementById('meter-label-left');
+            const lblM = document.getElementById('meter-label-mid');
+            const lblR = document.getElementById('meter-label-right');
+
+            // Reset Meter Labels
+            lblL.innerText = "Selamat";
+            lblM.innerText = "Waspada";
+            lblR.innerText = "Bahaya";
+
+            let percent = 0;
+            let color = "bg-green-500";
+            let text = "";
+
+            if (mode === 'temp') {
+                title.innerText = "Suhu Semasa";
+                val.innerText = Math.round(CWD.temp) + "°";
+                icon.innerText = "thermostat";
+                bgIcon.innerText = "thermostat";
+                
+                // KPM Temp Logic: 35 (Waspada), 37 (Bahaya)
+                // Range: 25 to 40
+                percent = Math.min(100, Math.max(0, ((CWD.temp - 25) / 15) * 100));
+                lblM.innerText = "35°C";
+                lblR.innerText = "37°C";
+
+                if (CWD.temp < 35) {
+                    color = "bg-green-500";
+                    text = "Suhu Selesa: Aktiviti luar dibenarkan mengikut jadual.";
+                } else if (CWD.temp < 37) {
+                    color = "bg-yellow-400";
+                    text = "STATUS BERJAGA-JAGA: Tangguhkan semua aktiviti luar (Sukan/Koko) - ARAHAN KPM.";
+                } else {
+                    color = "bg-red-500";
+                    text = "GELOMBANG HABA: Bahaya! Sekolah boleh diarahkan tutup. Elakkan aktiviti luar sepenuhnya.";
+                }
+            } else if (mode === 'aqi') {
+                title.innerText = "Kualiti Udara (IPU)";
+                val.innerText = CWD.aqi;
+                icon.innerText = "mask";
+                bgIcon.innerText = "mask";
+                
+                // AQI Logic: 50 (Baik), 100 (Sederhana), 200 (Bahaya)
+                percent = Math.min(100, (CWD.aqi / 200) * 100);
+                lblM.innerText = "IPU 100";
+                lblR.innerText = "IPU 200";
+
+                if (CWD.aqi <= 50) {
+                    color = "bg-green-500";
+                    text = "IPU BAIK: Udara bersih. Sesuai untuk aktiviti padang.";
+                } else if (CWD.aqi <= 100) {
+                    color = "bg-yellow-400";
+                    text = "IPU SEDERHANA: Boleh aktiviti luar, kurangkan jika sensitif.";
+                } else {
+                    color = "bg-red-500";
+                    text = "IPU TIDAK SIHAT: Hadkan aktiviti luar. Gunakan pelitup muka.";
+                }
+            } else if (mode === 'wind') {
+                title.innerText = "Kelajuan Angin";
+                val.innerText = CWD.wind + " km/j";
+                icon.innerText = "air";
+                bgIcon.innerText = "air";
+                percent = Math.min(100, (CWD.wind / 50) * 100);
+                lblM.innerText = "20km/j";
+                lblR.innerText = "40km/j";
+                text = CWD.wind > 40 ? "ANGIN KENCANG: Bahaya aktiviti luar!" : "Angin Tenang: Sesuai untuk aktiviti.";
+            } else if (mode === 'humidity') {
+                title.innerText = "Kelembapan Udara";
+                val.innerText = CWD.hum + "%";
+                icon.innerText = "water_drop";
+                bgIcon.innerText = "water_drop";
+                percent = CWD.hum;
+                text = "Kelembapan udara mempengaruhi keselesaan pernafasan murid.";
+            }
+
+            bar.style.width = percent + "%";
+            bar.className = "safety-progress " + color;
+            msg.innerText = text;
+        }
+
         async function panggilAPI_Cuaca() {
             if (!GD.lat || !GD.lng) return;
             
@@ -430,14 +510,13 @@
                 const hr = data.hourly;
                 const nowIdx = new Date().getHours();
                 
-                const tempEl = document.getElementById('cw-temp');
-                if (tempEl) tempEl.innerText = Math.round(cw.temperature);
-                
-                const windEl = document.getElementById('cw-wind');
-                if (windEl) windEl.innerText = cw.windspeed + ' km/j';
-                
-                const humEl = document.getElementById('cw-humidity');
-                if (humEl) humEl.innerText = hr.relative_humidity_2m[nowIdx] + ' %';
+                // Simpan data global
+                CWD.temp = cw.temperature;
+                CWD.wind = cw.windspeed;
+                CWD.hum = hr.relative_humidity_2m[nowIdx];
+
+                document.getElementById('cw-wind').innerText = CWD.wind + ' km/j';
+                document.getElementById('cw-humidity').innerText = CWD.hum + ' %';
                 
                 const dapatkanInfo = (kod) => {
                     if (kod === 0) return { teks: "Cerah", icon: "wb_sunny" };
@@ -446,59 +525,18 @@
                     return { teks: "Berawan", icon: "cloud_queue" }; 
                 };
                 
-                const info = dapatkanInfo(cw.weathercode);
-                const condEl = document.getElementById('cw-condition');
-                if (condEl) condEl.innerText = info.teks + ' Ceria';
-                
-                const iconEl = document.getElementById('cw-icon');
-                if (iconEl) iconEl.innerText = info.icon;
-                
-                // Safety Logic
-                const temp = cw.temperature;
-                const badge = document.getElementById('cw-safety-badge');
-                const alertBox = document.getElementById('safety-alert');
-
-                if (badge) {
-                    if (temp < 35) {
-                        badge.innerText = 'Sesuai untuk aktiviti luar!';
-                        badge.className = 'neo-btn bg-white px-4 py-2 text-black text-[10px] w-fit mt-6 border-2';
-                        if (alertBox) alertBox.classList.add('hidden');
-                    } else {
-                        badge.innerText = 'Waspada Suhu Tinggi!';
-                        badge.className = 'neo-btn bg-red-500 px-4 py-2 text-white text-[10px] w-fit mt-6 border-2';
-                        if (alertBox) alertBox.classList.remove('hidden');
-                    }
-                }
+                CWD.status = dapatkanInfo(cw.weathercode).teks;
 
                 // 2. AMBIL DATA KUALITI UDARA (AQI)
                 const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${GD.lat}&longitude=${GD.lng}&current=pm2_5,european_aqi`;
                 const aqiRes = await fetch(aqiUrl);
                 const aqiData = await aqiRes.json();
-                const curAqi = aqiData.current;
+                
+                CWD.aqi = aqiData.current.european_aqi;
+                document.getElementById('ipu-tahap-small').innerText = CWD.aqi;
 
-                const ipuTahap = document.getElementById('ipu-tahap');
-                const ipuNilai = document.getElementById('ipu-nilai');
-                const ipuPanduan = document.getElementById('ipu-panduan');
-                const ipuPeringatan = document.getElementById('ipu-peringatan');
-
-                if (ipuTahap) {
-                    const aqi = curAqi.european_aqi;
-                    ipuNilai.innerText = `PM2.5: ${curAqi.pm2_5} µg/m³`;
-                    
-                    if (aqi <= 50) {
-                        ipuTahap.innerText = "Baik";
-                        ipuPanduan.innerText = "Udara bersih. Sesuai untuk aktiviti riadah di padang.";
-                        ipuPeringatan.innerText = "Tiada risiko kesihatan dikesan.";
-                    } else if (aqi <= 100) {
-                        ipuTahap.innerText = "Sederhana";
-                        ipuPanduan.innerText = "Boleh beraktiviti luar, tetapi kurangkan intensiti jika sensitif.";
-                        ipuPeringatan.innerText = "Kumpulan berisiko perlu berhati-hati.";
-                    } else {
-                        ipuTahap.innerText = "Tidak Sihat";
-                        ipuPanduan.innerText = "Gunakan pelitup muka jika perlu berada di luar.";
-                        ipuPeringatan.innerText = "HADKAN AKTIVITI LUAR (ARAHAN KPM).";
-                    }
-                }
+                // Set Default Hero (Temperature)
+                tukarHero('temp');
 
                 // Render Forecast
                 const container = document.getElementById('forecast-container');
