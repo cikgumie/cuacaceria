@@ -490,6 +490,27 @@
                 bgIcon.innerText = "water_drop";
                 percent = CWD.hum;
                 text = "Kelembapan udara mempengaruhi keselesaan pernafasan murid.";
+            } else if (mode === 'tide') {
+                title.innerText = "Keadaan Laut (Ombak)";
+                val.innerText = CWD.wave + " m";
+                icon.innerText = "tsunami";
+                bgIcon.innerText = "tsunami";
+                
+                // Wave Logic: 0.5m (Waspada), 1.0m (Bahaya)
+                percent = Math.min(100, (CWD.wave / 1.5) * 100);
+                lblM.innerText = "0.5m";
+                lblR.innerText = "1.0m";
+
+                if (CWD.wave < 0.5) {
+                    color = "bg-green-500";
+                    text = "LAUT TENANG: Sesuai untuk aktiviti air dan mandi-manda.";
+                } else if (CWD.wave < 1.0) {
+                    color = "bg-yellow-400";
+                    text = "WASPADA: Ombak mula kuat. Awasi anak-anak di tepi pantai.";
+                } else {
+                    color = "bg-red-500";
+                    text = "BAHAYA: Ombak besar! Dilarang melakukan aktiviti air atau mandi laut.";
+                }
             }
 
             bar.style.width = percent + "%";
@@ -534,6 +555,14 @@
                 
                 CWD.aqi = aqiData.current.european_aqi;
                 document.getElementById('ipu-tahap-small').innerText = CWD.aqi;
+
+                // 3. AMBIL DATA LAUT (OMBAK)
+                try {
+                    const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${GD.lat}&longitude=${GD.lng}&current=wave_height`;
+                    const marineRes = await fetch(marineUrl);
+                    const marineData = await marineRes.json();
+                    CWD.wave = marineData.current.wave_height || 0;
+                } catch(e) { CWD.wave = 0; }
 
                 // Set Default Hero (Temperature)
                 tukarHero('temp');
