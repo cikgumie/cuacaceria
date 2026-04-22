@@ -334,6 +334,9 @@
 
         window.onload = async function() {
             try {
+                // 0. Mulakan pemerhatian WebViewString (Untuk integrasi MIT App Inventor)
+                mulakanPemerhatianWebViewString();
+
                 // 1. Ambil data dari cache dahulu (Pantas)
                 const cache = localStorage.getItem('PelajarData');
                 if (cache) { 
@@ -618,24 +621,59 @@
 
         function dapatkanGPS() {
             if ("geolocation" in navigator) {
-                // Tambah timeout dan error handler untuk elakkan hang
+                const status = document.getElementById('search-status');
+                if(status) status.innerText = "Mendapatkan lokasi...";
+
                 navigator.geolocation.getCurrentPosition(
                     (p) => {
                         GD.lat = p.coords.latitude.toFixed(6); 
                         GD.lng = p.coords.longitude.toFixed(6);
+                        if(status) status.innerText = "📍 Lokasi dikesan!";
+                        setTimeout(() => { if(status) status.innerText = ""; }, 2000);
                         kemaskiniUI();
                         panggilAPI_Cuaca();
                     },
                     (err) => {
-                        console.warn("GPS gagal didapatkan:", err.message);
-                        // Jika gagal, pastikan UI masih dikemaskini dengan data sedia ada
+                        let msg = "GPS gagal";
+                        if (err.code === 1) msg = "Izin lokasi ditolak peranti";
+                        else if (err.code === 2) msg = "Lokasi tidak tersedia";
+                        else if (err.code === 3) msg = "Masa tamat (Timeout) GPS";
+                        
+                        console.warn(msg, err.message);
+                        if(status) status.innerText = "⚠️ " + msg;
                         kemaskiniUI();
                     },
-                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                 );
             } else {
                 console.warn("Geolocation tidak disokong oleh peranti ini.");
             }
+        }
+
+        // Fungsi khas untuk MIT App Inventor - Terima koordinat melalui WebViewString
+        function mulakanPemerhatianWebViewString() {
+            setInterval(() => {
+                try {
+                    // Semak jika window.AppInventor wujud (hanya dalam WebViewer)
+                    if (typeof window.AppInventor !== 'undefined' && window.AppInventor.getWebViewString) {
+                        const data = window.AppInventor.getWebViewString();
+                        if (data && data.includes(',')) {
+                            const parts = data.split(',');
+                            const newLat = parseFloat(parts[0]).toFixed(6);
+                            const newLng = parseFloat(parts[1]).toFixed(6);
+                            
+                            // Hanya kemaskini jika koordinat berbeza
+                            if (newLat !== GD.lat || newLng !== GD.lng) {
+                                console.log("Menerima lokasi dari App Inventor:", newLat, newLng);
+                                GD.lat = newLat;
+                                GD.lng = newLng;
+                                kemaskiniUI();
+                                panggilAPI_Cuaca();
+                            }
+                        }
+                    }
+                } catch (e) { console.error("Ralat WebViewString:", e); }
+            }, 2000); // Semak setiap 2 saat
         }
 
         async function simpanDataPenuh() {
