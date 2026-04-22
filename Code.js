@@ -157,29 +157,52 @@ function dapatkanTipAI(data) {
 /**
  * PENGENDALI PERMINTAAN DARI GITHUB (CORS FRIENDLY)
  */
-function doPost(e) {
-  try {
-    const params = JSON.parse(e.postData.contents);
-    const functionName = params.functionName;
-    const args = params.args;
-    let result;
 
+// Fungsi utama untuk menguruskan permintaan (GET & POST)
+function prosesPermintaan(functionName, args) {
+  var result;
+  try {
     if (functionName === 'simpanTetapan') {
       result = simpanTetapan(args);
-    } else if (functionName === 'getUserData') {
-      result = getUserData();
     } else if (functionName === 'dapatkanTipAI') {
       result = dapatkanTipAI(args);
+    } else if (functionName === 'getUserData') {
+      result = getUserData();
     } else if (functionName === 'simpanApiKeyAI') {
       result = simpanApiKeyAI();
     } else {
       result = { status: 'error', message: 'Fungsi tidak dijumpai.' };
     }
+  } catch (e) {
+    result = { status: 'error', message: e.toString() };
+  }
+  return result;
+}
 
-    return ContentService.createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
+// Handler untuk GET (Sokong JSONP untuk bypass CORS)
+function doGet(e) {
+  var functionName = e.parameter.functionName;
+  var args = e.parameter.args ? JSON.parse(e.parameter.args) : {};
+  var callback = e.parameter.callback;
+  
+  var result = prosesPermintaan(functionName, args);
+  var jsonString = JSON.stringify(result);
+  
+  if (callback) {
+    // Balas dalam format JSONP: callbackName({"data": "..."})
+    return ContentService.createTextOutput(callback + '(' + jsonString + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  } else {
+    return ContentService.createTextOutput(jsonString)
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// Handler untuk POST
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var result = prosesPermintaan(data.functionName, data.args);
+  
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
 }
