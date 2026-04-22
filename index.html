@@ -69,25 +69,40 @@
     </div>
 
     <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-3xl flex justify-between items-center px-6 py-4">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fdd34d]">
-                <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=ffafbd" class="w-full h-full object-cover">
+    <header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-3xl flex flex-col px-6 py-4 transition-all duration-300" id="main-header">
+        <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fdd34d]">
+                    <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=ffafbd" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 class="text-sky-700 font-headline font-bold tracking-tight text-xl leading-tight">Cuaca Ceria</h1>
+                    <p id="ui-date" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Memuatkan tarikh...</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-sky-700 font-headline font-bold tracking-tight text-xl leading-tight">Cuaca Ceria</h1>
-                <p id="ui-date" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Memuatkan tarikh...</p>
+            <div class="flex items-center gap-2">
+                <span id="ui-name" class="text-xs font-bold text-sky-700 hidden md:block">Pelajar</span>
+                <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full text-sky-700 hover:bg-sky-100/50 transition-all active:scale-90">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <span id="ui-name" class="text-xs font-bold text-sky-700 hidden md:block">Pelajar</span>
-            <button class="w-10 h-10 flex items-center justify-center rounded-full text-sky-700 hover:bg-sky-100/50 transition-all active:scale-90">
-                <span class="material-symbols-outlined">search</span>
-            </button>
+        
+        <!-- Search Bar (Hidden by default) -->
+        <div id="search-bar" class="hidden mt-4 w-full animate-fadeIn">
+            <div class="relative flex items-center">
+                <input type="text" id="input-carian" placeholder="Cari bandar (cth: Kota Bharu)..." 
+                       class="w-full bg-white/80 border border-sky-100 rounded-2xl px-5 py-3 text-sm focus:ring-2 focus:ring-sky-500 outline-none shadow-sm pr-12">
+                <button onclick="cariBandar()" class="absolute right-2 bg-sky-600 text-white p-2 rounded-xl hover:bg-sky-700 transition-colors">
+                    <span class="material-symbols-outlined text-sm">search</span>
+                </button>
+            </div>
+            <p id="search-status" class="text-[10px] text-sky-600 mt-2 font-bold px-1"></p>
         </div>
     </header>
 
-    <main class="pt-24 px-6 space-y-8 max-w-2xl mx-auto">
+    <main class="pt-28 px-6 space-y-8 max-w-2xl mx-auto">
+
 
         <section id="view-dashboard" class="tab-content active space-y-6">
             <div id="gps-alert" class="bg-orange-50 border border-orange-200 p-4 rounded-xl hidden items-center gap-3 text-orange-600">
@@ -310,7 +325,40 @@
             if(tabId !== 'tetapan') panggilAPI_Cuaca();
         }
 
+        function toggleSearch() {
+            const bar = document.getElementById('search-bar');
+            bar.classList.toggle('hidden');
+            if(!bar.classList.contains('hidden')) document.getElementById('input-carian').focus();
+        }
+
+        async function cariBandar() {
+            const q = document.getElementById('input-carian').value;
+            if(!q) return;
+            const status = document.getElementById('search-status');
+            status.innerText = "Mencari...";
+            
+            try {
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=ms&format=json`);
+                const data = await res.json();
+                
+                if(data.results && data.results.length > 0) {
+                    const loc = data.results[0];
+                    GD.lat = loc.latitude.toFixed(6);
+                    GD.lng = loc.longitude.toFixed(6);
+                    status.innerText = `Lokasi dijumpai: ${loc.name}, ${loc.country}`;
+                    setTimeout(() => { toggleSearch(); status.innerText = ""; }, 1500);
+                    kemaskiniUI();
+                    panggilAPI_Cuaca();
+                } else {
+                    status.innerText = "Lokasi tidak dijumpai. Cuba ejaan lain.";
+                }
+            } catch(e) {
+                status.innerText = "Ralat carian.";
+            }
+        }
+
         function kemaskiniUI() {
+
             const skrg = new Date();
             const senaraiHari = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
             const senaraiBulan = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
