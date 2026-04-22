@@ -323,27 +323,46 @@
             });
         }
 
-        window.onload = async function() {
-            const cache = localStorage.getItem('PelajarData');
-            if (cache) { 
-                Object.assign(GD, JSON.parse(cache)); 
-                kemaskiniUI(); 
-                panggilAPI_Cuaca(); 
+        // Fail-safe: Tutup loader selepas 10 saat jika masih terbuka
+        setTimeout(function() {
+            var loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                console.warn("Fail-safe: Menutup loader secara paksa.");
+                loader.style.display = 'none';
             }
-            
-            dapatkanGPS();
+        }, 10000);
 
+        window.onload = async function() {
             try {
-                const res = await panggilBackend('getUserData');
-                if (res && res.settings) {
-                    Object.assign(GD, res.settings);
-                    localStorage.setItem('PelajarData', JSON.stringify(GD));
-                    kemaskiniUI();
-                    panggilAPI_Cuaca();
+                // 1. Ambil data dari cache dahulu (Pantas)
+                const cache = localStorage.getItem('PelajarData');
+                if (cache) { 
+                    try {
+                        Object.assign(GD, JSON.parse(cache)); 
+                        kemaskiniUI(); 
+                        panggilAPI_Cuaca(); 
+                    } catch(e) { console.warn("Ralat cache:", e); }
                 }
-            } catch (e) {
-                console.warn("Gagal dapatkan data dari cloud, guna data lokal.");
+                
+                // 2. Mula dapatkan lokasi (Async, tidak tunggu)
+                dapatkanGPS();
+
+                // 3. Ambil data terkini dari Cloud
+                try {
+                    const res = await panggilBackend('getUserData');
+                    if (res && res.settings) {
+                        Object.assign(GD, res.settings);
+                        localStorage.setItem('PelajarData', JSON.stringify(GD));
+                        kemaskiniUI();
+                        panggilAPI_Cuaca();
+                    }
+                } catch (e) {
+                    console.warn("Gagal dapatkan data dari cloud, guna data lokal/cache.");
+                }
+            } catch (err) {
+                console.error("Ralat permulaan:", err);
             } finally {
+                // Sentiasa pastikan loader ditutup
                 const loader = document.getElementById('loader');
                 if (loader) loader.style.display = 'none';
             }
@@ -599,12 +618,23 @@
 
         function dapatkanGPS() {
             if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    GD.lat = p.coords.latitude.toFixed(6); 
-                    GD.lng = p.coords.longitude.toFixed(6);
-                    kemaskiniUI();
-                    panggilAPI_Cuaca();
-                });
+                // Tambah timeout dan error handler untuk elakkan hang
+                navigator.geolocation.getCurrentPosition(
+                    (p) => {
+                        GD.lat = p.coords.latitude.toFixed(6); 
+                        GD.lng = p.coords.longitude.toFixed(6);
+                        kemaskiniUI();
+                        panggilAPI_Cuaca();
+                    },
+                    (err) => {
+                        console.warn("GPS gagal didapatkan:", err.message);
+                        // Jika gagal, pastikan UI masih dikemaskini dengan data sedia ada
+                        kemaskiniUI();
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            } else {
+                console.warn("Geolocation tidak disokong oleh peranti ini.");
             }
         }
 
