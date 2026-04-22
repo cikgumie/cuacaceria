@@ -363,7 +363,7 @@
                     if (kod === 0) return { teks: "Cerah", icon: "wb_sunny" };
                     if (kod >= 1 && kod <= 3) return { teks: "Mendung", icon: "cloud" };
                     if (kod >= 51 && kod <= 67) return { teks: "Hujan", icon: "cloudy_snowing" };
-                    return { teks: "Berawan", icon: "partly_cloud_day" };
+                    return { teks: "Berawan", icon: "cloud_queue" }; // Guna cloud_queue lebih selamat
                 };
                 
                 const info = dapatkanInfo(cw.weathercode);
@@ -394,14 +394,15 @@
                 }
 
                 // AI Tip via Backend
-                const aiRes = await panggilBackend('dapatkanTipAI', {
+                panggilBackend('dapatkanTipAI', {
                     temp: Math.round(cw.temperature),
                     status: info.teks,
                     aqi: 50,
                     uv: hr.uv_index[nowIdx]
-                });
-                const aiTipEl = document.getElementById('ai-tip-text');
-                if (aiRes && aiTipEl) aiTipEl.innerText = `"${aiRes}"`;
+                }).then(aiRes => {
+                    const aiTipEl = document.getElementById('ai-tip-text');
+                    if (aiRes && aiTipEl) aiTipEl.innerText = `"${aiRes}"`;
+                }).catch(err => console.error("Ralat AI:", err));
 
                 // Render Forecast
                 const container = document.getElementById('forecast-container');
@@ -410,8 +411,8 @@
                     for (let i = 1; i < 5; i++) {
                         const f = dapatkanInfo(data.daily.weather_code[i]);
                         const row = document.createElement('div');
-                        row.className = 'flex items-center justify-between bg-white/70 p-4 rounded-2xl';
-                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-primary">${f.icon}</span><p class="font-bold text-sm text-slate-800">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-slate-800">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
+                        row.className = 'flex items-center justify-between bg-white/10 p-4 rounded-2xl border border-white/5';
+                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-amber-400">${f.icon}</span><p class="font-bold text-sm text-white/80">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-white">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
                         container.appendChild(row);
                     }
                 }
@@ -424,14 +425,15 @@
                     for (let i = skrgHr; i < skrgHr + 6; i++) {
                         const h = dapatkanInfo(hr.weather_code[i]);
                         const card = document.createElement('div');
-                        card.className = 'min-w-[100px] bg-white/70 p-5 rounded-[2rem] flex flex-col items-center gap-3';
-                        card.innerHTML = `<span class="text-[9px] font-bold opacity-60">${i % 24}:00</span><span class="material-symbols-outlined text-3xl">${h.icon}</span><span class="font-black text-xl">${Math.round(hr.temperature_2m[i])}°</span>`;
+                        card.className = 'min-w-[100px] bg-white/10 p-5 rounded-[2rem] flex flex-col items-center gap-3 border border-white/5';
+                        card.innerHTML = `<span class="text-[9px] font-bold text-white/40">${i % 24}:00</span><span class="material-symbols-outlined text-3xl text-amber-300">${h.icon}</span><span class="font-black text-xl text-white">${Math.round(hr.temperature_2m[i])}°</span>`;
                         dash.appendChild(card);
                     }
                 }
 
             } catch (err) { console.error(err); }
         }
+
 
         function dapatkanGPS() {
             if ("geolocation" in navigator) {
