@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuaca Ceria - GitHub Edition</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          "darkMode": "selector",
+          "theme": {
+            "extend": {
+              "colors": {
+                "surface-dim": "#bfdad9", "surface-tint": "#705900", "on-tertiary-fixed": "#380017",
+                "error-container": "#fb5151", "secondary-fixed-dim": "#6ccfff", "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed-variant": "#760038", "on-surface": "#223131", "on-secondary-fixed-variant": "#005775",
+                "outline-variant": "#9fb1b0", "secondary-dim": "#005673", "on-background": "#223131",
+                "on-surface-variant": "#4e5f5e", "on-secondary": "#e6f5ff", "tertiary-fixed": "#ff8eaf",
+                "primary-fixed": "#fdd34d", "tertiary-container": "#ff8eaf", "on-secondary-container": "#004d68",
+                "inverse-primary": "#fdd34d", "on-primary-fixed": "#463600", "secondary-container": "#97daff",
+                "tertiary": "#a7295a", "outline": "#697a79", "on-primary": "#fff2d4", "tertiary-dim": "#971b4e",
+                "surface-container-high": "#d0e7e6", "surface": "#e8faf9", "surface-variant": "#c8e2e1",
+                "on-tertiary": "#ffeff1", "surface-container-highest": "#c8e2e1", "on-error-container": "#570008",
+                "secondary": "#006384", "surface-container-low": "#e1f5f4", "on-primary-fixed-variant": "#675200",
+                "surface-bright": "#e8faf9", "tertiary-fixed-dim": "#ff75a2", "error": "#b31b25",
+                "primary-dim": "#624d00", "primary-fixed-dim": "#eec540", "primary-container": "#fdd34d",
+                "on-primary-container": "#5c4900", "secondary-fixed": "#97daff", "on-secondary-fixed": "#00394e",
+                "on-error": "#ffefee", "primary": "#705900", "inverse-on-surface": "#8fa0a0", "error-dim": "#9f0519",
+                "background": "#e8faf9", "inverse-surface": "#021111", "on-tertiary-container": "#66002f",
+                "surface-container": "#d7edec"
+              },
+              "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+              "fontFamily": { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"], "label": ["Plus Jakarta Sans"] }
+            }
+          }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; min-height: max(884px, 100dvh); overflow-x: hidden; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #loader { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Night Theme */
+        body.is-night { background-color: #0d1b1b !important; color: #e0e0e0 !important; }
+        .is-night .bg-white\/70, .is-night .bg-white\/60, .is-night .bg-white\/30 { background-color: rgba(30, 41, 41, 0.7) !important; border-color: rgba(255, 255, 255, 0.1) !important; }
+        .is-night .text-slate-800, .is-night .text-sky-700, .is-night .text-slate-500 { color: #cfd8dc !important; }
+        .is-night .bg-\[\#e1f5f4\], .is-night .bg-\[\#e8faf9\] { background-color: #1a2a2a !important; }
+        
+        .safety-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.3); overflow: hidden; margin-top: 12px; }
+        .safety-progress { height: 100%; transition: width 0.5s ease, background-color 0.5s ease; }
+    </style>
+</head>
+<body class="bg-[#e8faf9] text-[#223131] min-h-screen pb-32 overflow-x-hidden font-body">
+
+    <div id="loader" class="fixed inset-0 bg-white/50 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
+        <div class="w-10 h-10 border-4 border-[#705900] border-t-transparent rounded-full animate-spin mb-2"></div>
+        <p class="font-semibold text-slate-700">Memproses data...</p>
+    </div>
+
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-3xl flex justify-between items-center px-6 py-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fdd34d]">
+                <img id="ui-avatar" alt="Profile" src="https://ui-avatars.com/api/?name=P&background=ffafbd" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h1 class="text-sky-700 font-headline font-bold tracking-tight text-xl leading-tight">Cuaca Ceria</h1>
+                <p id="ui-date" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Memuatkan tarikh...</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="ui-name" class="text-xs font-bold text-sky-700 hidden md:block">Pelajar</span>
+            <button class="w-10 h-10 flex items-center justify-center rounded-full text-sky-700 hover:bg-sky-100/50 transition-all active:scale-90">
+                <span class="material-symbols-outlined">search</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-24 px-6 space-y-8 max-w-2xl mx-auto">
+
+        <section id="view-dashboard" class="tab-content active space-y-6">
+            <div id="gps-alert" class="bg-orange-50 border border-orange-200 p-4 rounded-xl hidden items-center gap-3 text-orange-600">
+                <span class="material-symbols-outlined text-orange-400">warning</span>
+                <p class="text-xs font-semibold">Sila muat naik lokasi GPS di tab Tetapan untuk memantau cuaca.</p>
+            </div>
+
+            <div id="safety-alert" class="bg-rose-50 border border-rose-200 p-5 rounded-xl hidden items-center gap-4 text-rose-700 animate-pulse">
+                <div class="bg-rose-500 p-2 rounded-lg text-white">
+                    <span class="material-symbols-outlined">shield_alert</span>
+                </div>
+                <div>
+                    <h5 class="text-xs font-bold uppercase tracking-tight">STATUS: Aktiviti Luar Diberhentikan</h5>
+                    <p class="text-[10px] font-medium opacity-80 leading-tight">Suhu semasa melebihi 35°C. Sila kekal di dalam bangunan mengikut garis panduan KPM.</p>
+                </div>
+            </div>
+
+            <section id="hero-card" class="relative bg-gradient-to-br from-[#fdd34d] to-[#97daff] rounded-3xl p-8 overflow-hidden shadow-sm transition-all duration-700">
+                <div class="relative z-10 space-y-1">
+                    <h2 id="cw-condition" class="font-headline font-extrabold text-[#5c4900] text-4xl leading-tight">Menunggu Data...</h2>
+                    <p class="text-[#5c4900] opacity-80 font-medium text-sm">Lokasi Semasa Anda</p>
+                    
+                    <div class="mt-4 max-w-[200px]">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-[#5c4900] uppercase tracking-tighter">Status Keselamatan KPM</span>
+                            <span id="safety-level-text" class="text-[10px] font-bold text-[#5c4900]">Normal</span>
+                        </div>
+                        <div class="safety-bar">
+                            <div id="safety-progress" class="safety-progress bg-green-500" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between mt-6 relative z-10">
+                    <div class="flex flex-col">
+                        <span class="font-headline font-black text-7xl md:text-8xl tracking-tighter text-[#5c4900] flex items-start">
+                           <span id="cw-temp">--</span><span class="text-3xl mt-2">°C</span>
+                        </span>
+                        <span id="cw-safety-badge" class="bg-white/40 backdrop-blur-md px-4 py-1 rounded-full text-[#5c4900] font-bold text-xs w-fit mt-2">
+                            Memuatkan info...
+                        </span>
+                    </div>
+                    <div class="absolute -right-6 -bottom-4 opacity-90">
+                        <span id="cw-icon" class="material-symbols-outlined text-[140px] text-white drop-shadow-2xl animate-pulse" style="font-variation-settings: 'FILL' 1;">cloud_off</span>
+                    </div>
+                </div>
+                <div class="absolute -top-10 -right-10 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+            </section>
+
+            <section>
+                <h3 class="font-headline font-bold text-lg mb-4 px-1 text-slate-800">Hari Ini</h3>
+                <div id="dashboard-hourly" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    <div class="min-w-[100px] flex-shrink-0 bg-white/70 p-5 rounded-3xl flex flex-col items-center justify-center gap-3 shadow-sm border border-white animate-pulse h-28"></div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-2 gap-4">
+                <div class="bg-[#e1f5f4] p-6 rounded-3xl relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 bg-[#97daff] rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-[#006384]">air</span>
+                        </div>
+                        <p class="text-[#4e5f5e] text-[10px] font-bold uppercase tracking-wider">Kelajuan Angin</p>
+                        <p id="cw-wind" class="font-headline font-extrabold text-2xl mt-1 text-slate-800">-- km/j</p>
+                    </div>
+                </div>
+                <div class="bg-[#e1f5f4] p-6 rounded-3xl relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 bg-[#ff8eaf]/30 rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-[#a7295a]">humidity_mid</span>
+                        </div>
+                        <p class="text-[#4e5f5e] text-[10px] font-bold uppercase tracking-wider">Kelembapan</p>
+                        <p id="cw-humidity" class="font-headline font-extrabold text-2xl mt-1 text-slate-800">-- %</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ai-tip-container">
+               <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-3xl relative overflow-hidden group">
+                  <div class="relative z-10">
+                     <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-indigo-600 text-white p-2 rounded-xl scale-75 origin-left">
+                           <span class="material-symbols-outlined">smart_toy</span>
+                        </div>
+                        <h4 class="font-headline font-bold text-indigo-900 text-sm tracking-tight">Tip Pintar AI (Gemma)</h4>
+                     </div>
+                     <p id="ai-tip-text" class="text-[11px] font-medium text-indigo-800 leading-relaxed italic">"Sedang memikirkan tip terbaik untuk anda..."</p>
+                  </div>
+               </div>
+            </section>
+
+            <section class="bg-white/30 rounded-3xl p-6">
+                <h3 class="font-headline font-bold text-lg text-slate-800 mb-6">Ramalan 4 Hari</h3>
+                <div id="forecast-container" class="space-y-4">
+                    <div class="h-20 bg-white/50 rounded-2xl animate-pulse"></div>
+                </div>
+            </section>
+        </section>
+
+        <section id="view-hourly" class="tab-content space-y-6">
+            <h2 class="text-xl font-bold text-slate-800">Ramalan Setiap Jam</h2>
+            <div id="hourly-container" class="space-y-4">
+                <div class="bg-white/50 p-6 rounded-3xl animate-pulse h-32 w-full"></div>
+            </div>
+        </section>
+
+        <section id="view-tetapan" class="tab-content">
+            <div class="bg-white/60 p-8 rounded-[3rem] max-w-2xl border border-white shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 border-b border-white/50 pb-4">Profil & Lokasi Pelajar</h2>
+                
+                <!-- URL Backend Info -->
+                <div id="url-warning" class="bg-rose-50 border border-rose-200 p-4 rounded-2xl mb-6 text-rose-700 text-xs font-medium">
+                    <p>Sila masukkan <strong>URL Web App</strong> anda dalam kod <code>index.html</code> (pembolehubah <code>BACKEND_URL</code>) untuk membolehkan penyimpanan data.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Penuh</label>
+                        <input type="text" id="input-nama" class="w-full bg-white/50 border border-white rounded-2xl px-4 py-3.5 text-sm outline-none transition-all shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Lokasi Semasa (GPS)</label>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="input-gps" readonly placeholder="Klik butang untuk lokasi" class="w-full bg-slate-100/50 border border-white rounded-2xl px-4 py-3.5 text-sm outline-none shadow-inner text-slate-500 font-mono">
+                            <button onclick="dapatkanGPS()" class="bg-[#705900] hover:bg-[#5c4900] text-white p-3.5 rounded-2xl shadow-md transition-all active:scale-95">
+                                <span class="material-symbols-outlined">map_pin</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="simpanDataPenuh()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-3xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2 mt-4 uppercase text-xs tracking-widest">
+                        <span class="material-symbols-outlined">save</span> Simpan Tetapan
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-8 pb-4 bg-white/80 backdrop-blur-2xl rounded-t-[3rem] h-24 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+        <button id="btn-dashboard" onclick="switchTab('dashboard')" class="flex flex-col items-center justify-center bg-[#fdd34d] text-[#5c4900] rounded-full px-6 py-2 transition-all active:scale-95">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-headline font-bold text-[10px] uppercase tracking-tighter mt-1">Dashboard</span>
+        </button>
+        <button id="btn-hourly" onclick="switchTab('hourly')" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95">
+            <span class="material-symbols-outlined">schedule</span>
+            <span class="font-headline font-semibold text-[10px] uppercase tracking-tighter mt-1">Hourly</span>
+        </button>
+        <button id="btn-tetapan" onclick="switchTab('tetapan')" class="flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-headline font-semibold text-[10px] uppercase tracking-tighter mt-1">Profil</span>
+        </button>
+    </nav>
+
+    <script>
+        // --- KONFIGURASI BACKEND ---
+        // Gantikan URL di bawah dengan URL Web App (GAS) anda setelah anda men-deploy semula Code.js
+        const BACKEND_URL = 'https://script.google.com/macros/s/1Jg1onQoPrrm4Z4Q9LE7H6G5yOLGIt6Uu7AP6YEeUwf-55UWXKMrN6yLC/exec';
+        
+        const GD = { id: 'PELAJAR_TAMU', nama: '', gambar: '', lat: null, lng: null };
+
+
+        // Helper untuk panggil GAS dari GitHub
+        async function panggilBackend(functionName, args = {}) {
+            if (BACKEND_URL.includes('SILA_MASUKKAN')) {
+                console.warn("Backend URL tidak ditetapkan.");
+                return null;
+            }
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({ functionName, args })
+                });
+                return await response.json();
+            } catch (e) {
+                console.error("Ralat panggil backend:", e);
+                return null;
+            }
+        }
+
+        window.onload = async function() {
+            const cache = localStorage.getItem('PelajarData');
+            if (cache) { 
+                Object.assign(GD, JSON.parse(cache)); 
+                kemaskiniUI(); 
+                panggilAPI_Cuaca(); 
+            }
+            
+            dapatkanGPS();
+
+            const res = await panggilBackend('getUserData');
+            if (res && res.settings) {
+                Object.assign(GD, res.settings);
+                localStorage.setItem('PelajarData', JSON.stringify(GD));
+                kemaskiniUI();
+                panggilAPI_Cuaca();
+            }
+            
+            if (!BACKEND_URL.includes('SILA_MASUKKAN')) {
+                const warning = document.getElementById('url-warning');
+                if (warning) warning.style.display = 'none';
+            }
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => { el.style.display = 'none'; el.classList.remove('active'); });
+            const target = document.getElementById('view-' + tabId);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+            ['dashboard', 'hourly', 'tetapan'].forEach(t => {
+                const btn = document.getElementById('btn-' + t);
+                if (btn) {
+                    const isAktif = (t === tabId);
+                    btn.setAttribute('class', isAktif ? "flex flex-col items-center justify-center bg-[#fdd34d] text-[#5c4900] rounded-full px-6 py-2 transition-all active:scale-95" : "flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95");
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    if(icon) icon.style.fontVariationSettings = isAktif ? "'FILL' 1" : "'FILL' 0";
+                }
+            });
+            if(tabId !== 'tetapan') panggilAPI_Cuaca();
+        }
+
+        function kemaskiniUI() {
+            const skrg = new Date();
+            const senaraiHari = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+            const senaraiBulan = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+            const dateEl = document.getElementById('ui-date');
+            if (dateEl) dateEl.innerText = senaraiHari[skrg.getDay()] + ', ' + skrg.getDate() + ' ' + senaraiBulan[skrg.getMonth()];
+            
+            const nameEl = document.getElementById('ui-name');
+            if (nameEl) nameEl.innerText = GD.nama || 'Pelajar';
+            
+            const inputNama = document.getElementById('input-nama');
+            if (inputNama) inputNama.value = GD.nama || '';
+            
+            if (GD.lat && GD.lng) { 
+                const gpsInput = document.getElementById('input-gps');
+                if (gpsInput) gpsInput.value = GD.lat + ', ' + GD.lng; 
+                const gpsAlert = document.getElementById('gps-alert');
+                if (gpsAlert) gpsAlert.style.display = 'none'; 
+            } else { 
+                const gpsAlert = document.getElementById('gps-alert');
+                if (gpsAlert) gpsAlert.style.display = 'flex'; 
+            }
+        }
+
+        async function panggilAPI_Cuaca() {
+            if (!GD.lat || !GD.lng) return;
+            
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${GD.lat}&longitude=${GD.lng}&current_weather=true&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&hourly=temperature_2m,relative_humidity_2m,weather_code,uv_index&timezone=auto`;
+            
+            try {
+                const response = await fetch(weatherUrl);
+                const data = await response.json();
+                
+                const cw = data.current_weather;
+                const hr = data.hourly;
+                const nowIdx = new Date().getHours();
+                
+                const tempEl = document.getElementById('cw-temp');
+                if (tempEl) tempEl.innerText = Math.round(cw.temperature);
+                
+                const windEl = document.getElementById('cw-wind');
+                if (windEl) windEl.innerText = cw.windspeed + ' km/j';
+                
+                const humEl = document.getElementById('cw-humidity');
+                if (humEl) humEl.innerText = hr.relative_humidity_2m[nowIdx] + ' %';
+                
+                const isDay = cw.is_day === 1;
+                document.body.classList.toggle('is-night', !isDay);
+                
+                const dapatkanInfo = (kod) => {
+                    if (kod === 0) return { teks: "Cerah", icon: "wb_sunny" };
+                    if (kod >= 1 && kod <= 3) return { teks: "Mendung", icon: "cloud" };
+                    if (kod >= 51 && kod <= 67) return { teks: "Hujan", icon: "cloudy_snowing" };
+                    return { teks: "Berawan", icon: "partly_cloud_day" };
+                };
+                
+                const info = dapatkanInfo(cw.weathercode);
+                const condEl = document.getElementById('cw-condition');
+                if (condEl) condEl.innerText = info.teks + ' Ceria';
+                
+                const iconEl = document.getElementById('cw-icon');
+                if (iconEl) iconEl.innerText = info.icon;
+                
+                // Safety Logic
+                const temp = cw.temperature;
+                const progress = document.getElementById('safety-progress');
+                const levelText = document.getElementById('safety-level-text');
+                const badge = document.getElementById('cw-safety-badge');
+
+                if (progress && levelText && badge) {
+                    if (temp < 35) {
+                        progress.style.width = '30%';
+                        progress.className = 'safety-progress bg-green-500';
+                        levelText.innerText = 'Normal';
+                        badge.innerText = 'Sesuai untuk aktiviti luar!';
+                    } else {
+                        progress.style.width = '100%';
+                        progress.className = 'safety-progress bg-red-600';
+                        levelText.innerText = 'Amaran Suhu';
+                        badge.innerText = 'Waspada Suhu Tinggi!';
+                    }
+                }
+
+                // AI Tip via Backend
+                const aiRes = await panggilBackend('dapatkanTipAI', {
+                    temp: Math.round(cw.temperature),
+                    status: info.teks,
+                    aqi: 50,
+                    uv: hr.uv_index[nowIdx]
+                });
+                const aiTipEl = document.getElementById('ai-tip-text');
+                if (aiRes && aiTipEl) aiTipEl.innerText = `"${aiRes}"`;
+
+                // Render Forecast
+                const container = document.getElementById('forecast-container');
+                if (container) {
+                    container.innerHTML = '';
+                    for (let i = 1; i < 5; i++) {
+                        const f = dapatkanInfo(data.daily.weather_code[i]);
+                        const row = document.createElement('div');
+                        row.className = 'flex items-center justify-between bg-white/70 p-4 rounded-2xl';
+                        row.innerHTML = `<div class="flex items-center gap-4"><span class="material-symbols-outlined text-primary">${f.icon}</span><p class="font-bold text-sm text-slate-800">${i === 1 ? 'Esok' : 'Hari ' + (i+1)}</p></div><p class="font-black text-slate-800">${Math.round(data.daily.temperature_2m_max[i])}°</p>`;
+                        container.appendChild(row);
+                    }
+                }
+
+                // Render Dashboard Hourly
+                const dash = document.getElementById('dashboard-hourly');
+                if (dash) {
+                    dash.innerHTML = '';
+                    const skrgHr = new Date().getHours();
+                    for (let i = skrgHr; i < skrgHr + 6; i++) {
+                        const h = dapatkanInfo(hr.weather_code[i]);
+                        const card = document.createElement('div');
+                        card.className = 'min-w-[100px] bg-white/70 p-5 rounded-[2rem] flex flex-col items-center gap-3';
+                        card.innerHTML = `<span class="text-[9px] font-bold opacity-60">${i % 24}:00</span><span class="material-symbols-outlined text-3xl">${h.icon}</span><span class="font-black text-xl">${Math.round(hr.temperature_2m[i])}°</span>`;
+                        dash.appendChild(card);
+                    }
+                }
+
+            } catch (err) { console.error(err); }
+        }
+
+        function dapatkanGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    GD.lat = p.coords.latitude.toFixed(6); 
+                    GD.lng = p.coords.longitude.toFixed(6);
+                    const gpsInput = document.getElementById('input-gps');
+                    if(gpsInput) gpsInput.value = GD.lat + ', ' + GD.lng;
+                    kemaskiniUI();
+                    panggilAPI_Cuaca();
+                });
+            }
+        }
+
+        async function simpanDataPenuh() {
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'flex';
+            
+            const inputNama = document.getElementById('input-nama');
+            if (inputNama) GD.nama = inputNama.value;
+            
+            localStorage.setItem('PelajarData', JSON.stringify(GD));
+            
+            const res = await panggilBackend('simpanTetapan', GD);
+            if (loader) loader.style.display = 'none';
+            
+            if (res) alert('Tetapan disimpan di Cloud!');
+            else alert('Tetapan disimpan secara lokal sahaja.');
+            
+            kemaskiniUI();
+            panggilAPI_Cuaca();
+        }
+    </script>
+</body>
+</html>

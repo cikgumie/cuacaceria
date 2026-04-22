@@ -1,0 +1,7 @@
+# Google Apps Script files
+node_modules/
+.clasp.json
+appsscript.json
+
+# Keep Code.js and index.html
+# Code.js is good to have in GitHub for backup
