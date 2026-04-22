@@ -196,35 +196,54 @@
                 </div>
             </section>
 
-            <section class="grid grid-cols-2 gap-6">
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- KAD IPU -->
                 <div class="neo-card p-6 bg-white rotate-[-1deg]">
-                    <div class="w-12 h-12 bg-[#CCFF00] border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">air</span>
-                    </div>
-                    <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Angin</p>
-                    <p id="cw-wind" class="font-black text-3xl mt-1 text-black">-- km/j</p>
-                </div>
-                <div class="neo-card p-6 bg-white rotate-[1deg]">
-                    <div class="w-12 h-12 bg-sky-400 border-4 border-black flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined font-black">water_drop</span>
-                    </div>
-                    <p class="text-black/40 text-[10px] font-black uppercase tracking-widest">Lembap</p>
-                    <p id="cw-humidity" class="font-black text-3xl mt-1 text-black">-- %</p>
-                </div>
-            </section>
-
-            <section id="ai-tip-container">
-               <div class="neo-card bg-white p-6 relative overflow-hidden border-black">
-                  <div class="relative z-10">
-                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-black text-white p-2 rounded-md">
-                           <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-[#CCFF00] border-4 border-black flex items-center justify-center">
+                            <span class="material-symbols-outlined font-black">mask</span>
                         </div>
-                        <h4 class="font-black text-black text-sm uppercase tracking-widest italic underline decoration-4 decoration-[#CCFF00]">AI Smart Tip</h4>
-                     </div>
-                     <p id="ai-tip-text" class="text-[13px] font-bold text-black leading-relaxed italic bg-[#FAFF00] p-3 border-2 border-black">"Sedang memikirkan tip terbaik untuk anda..."</p>
-                  </div>
-               </div>
+                        <div class="bg-black text-white px-3 py-1 text-[10px] font-black uppercase">Indeks Udara</div>
+                    </div>
+                    <div class="mb-4">
+                        <p id="ipu-tahap" class="font-black text-3xl uppercase italic leading-tight">Memuatkan...</p>
+                        <p id="ipu-nilai" class="text-xs font-bold text-black/60 mt-1 uppercase tracking-widest">PM2.5: -- µg/m³</p>
+                    </div>
+                    <div class="space-y-3 pt-4 border-t-2 border-black border-dashed">
+                        <div class="flex gap-2">
+                            <span class="text-xs">💡</span>
+                            <p id="ipu-panduan" class="text-[10px] font-bold leading-tight">Panduan: Memuatkan...</p>
+                        </div>
+                        <div class="flex gap-2 bg-red-500 text-white p-2 border-2 border-black shadow-[2px_2px_0_0_#000]">
+                            <span class="text-xs">⚠️</span>
+                            <p id="ipu-peringatan" class="text-[10px] font-black leading-tight uppercase">Peringatan: Memuatkan...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KAD PASANG SURUT -->
+                <div class="neo-card p-6 bg-white rotate-[1deg]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-sky-400 border-4 border-black flex items-center justify-center">
+                            <span class="material-symbols-outlined font-black">tsunami</span>
+                        </div>
+                        <div class="bg-black text-white px-3 py-1 text-[10px] font-black uppercase">Pantai</div>
+                    </div>
+                    <div class="mb-4">
+                        <p class="font-black text-3xl uppercase italic leading-tight">Aktiviti Air</p>
+                        <p class="text-xs font-bold text-black/60 mt-1 uppercase tracking-widest">Kawasan Persisiran</p>
+                    </div>
+                    <div class="space-y-3 pt-4 border-t-2 border-black border-dashed">
+                        <div class="flex gap-2">
+                            <span class="text-xs">🌊</span>
+                            <p class="text-[10px] font-bold leading-tight">Panduan: Sentiasa periksa jadual pasang surut tempatan (JUPEM) sebelum mandi laut.</p>
+                        </div>
+                        <div class="flex gap-2 bg-amber-400 p-2 border-2 border-black shadow-[2px_2px_0_0_#000]">
+                            <span class="text-xs">🚫</span>
+                            <p class="text-[10px] font-black leading-tight uppercase text-black">Peringatan: Jauhi pantai jika ombak kuat atau angin kencang (Kelajuan > 40km/j).</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section class="neo-card bg-white p-6">
@@ -455,16 +474,35 @@
                     }
                 }
 
-                // AI Tip via Backend
-                panggilBackend('dapatkanTipAI', {
-                    temp: Math.round(cw.temperature),
-                    status: info.teks,
-                    aqi: 50,
-                    uv: hr.uv_index[nowIdx]
-                }).then(aiRes => {
-                    const aiTipEl = document.getElementById('ai-tip-text');
-                    if (aiRes && aiTipEl) aiTipEl.innerText = `"${aiRes}"`;
-                }).catch(err => console.error("Ralat AI:", err));
+                // 2. AMBIL DATA KUALITI UDARA (AQI)
+                const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${GD.lat}&longitude=${GD.lng}&current=pm2_5,european_aqi`;
+                const aqiRes = await fetch(aqiUrl);
+                const aqiData = await aqiRes.json();
+                const curAqi = aqiData.current;
+
+                const ipuTahap = document.getElementById('ipu-tahap');
+                const ipuNilai = document.getElementById('ipu-nilai');
+                const ipuPanduan = document.getElementById('ipu-panduan');
+                const ipuPeringatan = document.getElementById('ipu-peringatan');
+
+                if (ipuTahap) {
+                    const aqi = curAqi.european_aqi;
+                    ipuNilai.innerText = `PM2.5: ${curAqi.pm2_5} µg/m³`;
+                    
+                    if (aqi <= 50) {
+                        ipuTahap.innerText = "Baik";
+                        ipuPanduan.innerText = "Udara bersih. Sesuai untuk aktiviti riadah di padang.";
+                        ipuPeringatan.innerText = "Tiada risiko kesihatan dikesan.";
+                    } else if (aqi <= 100) {
+                        ipuTahap.innerText = "Sederhana";
+                        ipuPanduan.innerText = "Boleh beraktiviti luar, tetapi kurangkan intensiti jika sensitif.";
+                        ipuPeringatan.innerText = "Kumpulan berisiko perlu berhati-hati.";
+                    } else {
+                        ipuTahap.innerText = "Tidak Sihat";
+                        ipuPanduan.innerText = "Gunakan pelitup muka jika perlu berada di luar.";
+                        ipuPeringatan.innerText = "HADKAN AKTIVITI LUAR (ARAHAN KPM).";
+                    }
+                }
 
                 // Render Forecast
                 const container = document.getElementById('forecast-container');
