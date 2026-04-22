@@ -326,12 +326,19 @@
             
             dapatkanGPS();
 
-            const res = await panggilBackend('getUserData');
-            if (res && res.settings) {
-                Object.assign(GD, res.settings);
-                localStorage.setItem('PelajarData', JSON.stringify(GD));
-                kemaskiniUI();
-                panggilAPI_Cuaca();
+            try {
+                const res = await panggilBackend('getUserData');
+                if (res && res.settings) {
+                    Object.assign(GD, res.settings);
+                    localStorage.setItem('PelajarData', JSON.stringify(GD));
+                    kemaskiniUI();
+                    panggilAPI_Cuaca();
+                }
+            } catch (e) {
+                console.warn("Gagal dapatkan data dari cloud, guna data lokal.");
+            } finally {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
             }
         };
 
